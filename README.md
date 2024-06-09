@@ -5,7 +5,7 @@
 1. Setup new linux node
 2. log in into the node
 3. create folder `mkdir ìnfrastructure && cd infrastructure` -> pwd: /home/<your-username>/infrastructure
-4. run `git clone https://<pat>@github.com/m-mattia-m/infrastructure-setup.git`
+4. run `git clone --recurse-submodules https://<pat>@github.com/m-mattia-m/infrastructure-setup.git`
 5. install make: `sudo apt install make`
 
 ## Setup infrastructure

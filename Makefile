@@ -24,6 +24,7 @@ startup:
 	@make environment
 	@make start-caddy
 	@make start-portainer
+	@make start-invoiceplane
 
 shutdown:
 	@echo "--------------------------------------------------"
@@ -88,6 +89,13 @@ start-portainer:
 	@echo "--------------------------------------------------"
 	docker compose -f ./portainer/docker-compose.yaml up -d
 
+start-invoiceplane:
+	@echo "--------------------------------------------------"
+	@echo "                Start InvoicePlane                "
+	@echo "--------------------------------------------------"
+	./buildmeup.sh
+	./startmeup.sh
+
 up-all:
 	@echo "--------------------------------------------------"
 	@echo "                      Up all                      "
@@ -106,6 +114,12 @@ up-portainer:
 	@echo "                   Up Portainer                   "
 	@echo "--------------------------------------------------"
 	docker compose -f ./portainer/docker-compose.yaml up -d
+
+up-invoiceplane:
+	@echo "--------------------------------------------------"
+	@echo "                  Up InvoicePlane                 "
+	@echo "--------------------------------------------------"
+	./startmeup.sh
 
 stop-all:
 	@echo "--------------------------------------------------"
