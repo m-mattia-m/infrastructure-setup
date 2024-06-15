@@ -13,6 +13,16 @@
   ansible.builtin.docker_network:
     name: proxy
 
+- name:  Replace ansible.fqdn with fqdn
+  vars:
+    target_directory: /home/{{ ansible_user }}/infrastructure/services/traefik
+    placeholder: "{ansible.fqdn}"
+    replacement: "{{ fqdn }}"
+  become: true
+  shell: |
+    find {{ target_directory }} -type f -exec sed -i 's/{{ placeholder }}/{{ replacement }}/g' {} +
+  args:
+    executable: /bin/bash
 - name: Start traefik
   become: true # run command with sudo access
   community.docker.docker_compose_v2:
