@@ -1,2 +1,2 @@
-/caddy/.env
-/.vscode
+./ansible/hosts.ini
+./ansible/hosts.cfg
