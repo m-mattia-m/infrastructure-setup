@@ -1,6 +1,0 @@
-[submodule "invoiceplane/InvoicePlane-Docker"]
-	path = invoiceplane/InvoicePlane-Docker
-	url = https://github.com/InvoicePlane/InvoicePlane-Docker
-[submodule "InvoicePlane-Docker"]
-	path = InvoicePlane-Docker
-	url = https://github.com/InvoicePlane/InvoicePlane-Docker

@@ -1,0 +1,10 @@
+---
+# roles/services/tasks/main.yml
+
+- name: Create docker proxy network
+  ansible.builtin.docker_network:
+    name: proxy
+
+- name: Create docker proxy network
+  ansible.builtin.docker_network:
+    name: proxy

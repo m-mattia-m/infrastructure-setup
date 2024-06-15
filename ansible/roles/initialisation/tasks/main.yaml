@@ -1,0 +1,35 @@
+---
+# roles/initialisation/tasks/main.yml
+
+- name: Ensure the VM is reachable
+  ansible.builtin.ping:
+
+- name: Update apt cache
+  ansible.builtin.apt:
+    update_cache: true
+  become: true
+
+- name: Install gnome-terminal and curl via apt
+  ansible.builtin.apt:
+    name: gnome-terminal, curl
+    update_cache: true
+  become: true
+
+- name: Install git-all via apt
+  ansible.builtin.apt:
+    name: git-all
+    state: present
+    update_cache: true
+  become: true
+
+- name: Install Docker and Docker Compse via snap
+  ansible.builtin.snap:
+    name: docker
+    state: present
+  become: true
+
+- name: Install go via snap
+  ansible.builtin.apt:
+    name: golang-go
+    state: present
+  become: true
