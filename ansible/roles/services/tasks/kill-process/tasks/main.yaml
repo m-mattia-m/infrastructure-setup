@@ -1,0 +1,11 @@
+---
+- name: Find PID of processes listening on port 80
+  become: true
+  ansible.builtin.shell: sudo lsof -t -i :80
+  register: pid_result
+  changed_when: false  # Since this task is read-only, mark it as unchanged
+
+- name: Kill processes with found PIDs
+  become: true
+  ansible.builtin.shell: sudo kill {{ pid_result.stdout }}
+  when: pid_result.stdout is defined

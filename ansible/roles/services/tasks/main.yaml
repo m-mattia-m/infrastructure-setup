@@ -14,11 +14,15 @@
     name: proxy
 
 - name: Call replacement tasks
-  ansible.builtin.include_tasks: ./replace_fqdn/tasks/main.yaml
+  ansible.builtin.include_tasks: ./replace-fqdn/tasks/main.yaml
   vars:
     target_directory: /home/{{ ansible_user }}/infrastructure/services/traefik
     placeholder: "{ansible.fqdn}"
     replacement: "{{ fqdn }}"
+
+- name: Kill processes running on port 80
+  ansible.builtin.include_tasks: ./kill-process/tasks/main.yaml
+
 
 - name: Start traefik
   become: true # run command with sudo access

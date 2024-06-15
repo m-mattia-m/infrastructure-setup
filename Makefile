@@ -31,4 +31,4 @@ new-node:
 	@echo "--------------------------------------------------"
 	@echo "           Setup new node with ansible            "
 	@echo "--------------------------------------------------"
-	ansible-playbook -i hosts.ini playbook.yaml
+	ansible-playbook -i ./ansible/hosts.ini ./ansible/playbook.yaml
