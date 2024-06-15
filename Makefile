@@ -15,7 +15,7 @@ generate-environment:
 	@echo "------------ Set traefik environment -------------"
 	@echo "\
 		TRAEFIK_DASHBOARD_CREDENTIALS=\"$(TRAEFIK_DASHBOARD_CREDENTIALS)\"\n\
-		CADDY_TLS_EMAIL=\"$(CADDY_TLS_EMAIL)\"\n\
+		INFOMANIAK_ACCESS_TOKEN=\"$(INFOMANIAK_ACCESS_TOKEN)\"\n\
 	" | sed 's/^[[:space:]]*//g' > ./services/traefik/.env
 
 install-ansible:

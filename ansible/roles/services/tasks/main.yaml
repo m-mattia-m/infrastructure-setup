@@ -20,11 +20,25 @@
     placeholder: "{ansible.fqdn}"
     replacement: "{{ fqdn }}"
 
-- name: Kill processes running on port 80
-  ansible.builtin.include_tasks: ./kill-process/tasks/main.yaml
+# - name: Kill processes running on port 80
+#   ansible.builtin.include_tasks: ./kill-process/tasks/main.yaml
 
+- name: Copy environment
+  vars:
+    parent_dir: "{{ playbook_dir | dirname }}"
+  ansible.builtin.copy:
+    src: "{{ parent_dir }}/config.env"
+    dest: "/home/{{ ansible_user }}/infrastructure/"
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: '0644'
+
+- name: Generate environment files with }/config.env
+  ansible.builtin.make:
+    chdir: "/home/{{ ansible_user }}/infrastructure/"
+    target: generate-environment
 
 - name: Start traefik
-  become: true # run command with sudo access
+  become: true
   community.docker.docker_compose_v2:
     project_src: /home/{{ ansible_user }}/infrastructure/services/traefik
