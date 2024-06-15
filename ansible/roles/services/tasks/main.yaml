@@ -1,10 +1,20 @@
 ---
 # roles/services/tasks/main.yml
 
+- name: Clone services from repository
+  ansible.builtin.git:
+    repo: 'https://github.com/m-mattia-m/infrastructure-setup.git'
+    dest: /home/{{ ansible_user }}/infrastructure
+    clone: true
+    version: ansible
+
 - name: Create docker proxy network
+  become: true # run command with sudo access
   ansible.builtin.docker_network:
     name: proxy
 
-- name: Create docker proxy network
-  ansible.builtin.docker_network:
-    name: proxy
+- name: Start traefik
+  become: true # run command with sudo access
+  community.docker.docker_compose_v2:
+    project_src: /home/{{ ansible_user }}/infrastructure/services/traefik
+    register: output
