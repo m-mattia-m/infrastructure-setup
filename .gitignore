@@ -2,4 +2,5 @@
 ./ansible/hosts.cfg
 ./config.env
 config.env
+**/config.env
 **/.env
