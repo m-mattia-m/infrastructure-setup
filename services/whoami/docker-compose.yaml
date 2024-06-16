@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  whoami:
+    image: traefik/whoami
+    networks:
+      - proxy
+    ports:
+      - 8080:80
+    labels:
+      - "traefik.http.routers.whoami.rule=Host(`whoami.{ansible.fqdn}`)"
+
+networks:
+  proxy:
+    external: true

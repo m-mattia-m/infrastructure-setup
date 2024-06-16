@@ -8,6 +8,13 @@
     clone: true
     version: ansible
 
+- name: Update traefik acme.json permissions
+  ansible.builtin.file:
+    path: "/home/{{ ansible_user }}/infrastructure/services/traefik/data/acme.json"
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: "0600"
+
 - name: Create docker proxy network
   become: true # run command with sudo access
   ansible.builtin.docker_network:
