@@ -29,7 +29,7 @@ providers:
     exposedByDefault: false
     endpoint: "unix:///var/run/docker.sock"
     watch: true
-  file: # traefik checks this folder dynamically for statics files which should be public 
+  file: # traefik checks this folder dynamically for statics files which should be public
     directory: ./data/public/
     watch: true
 

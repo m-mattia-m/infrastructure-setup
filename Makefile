@@ -16,6 +16,7 @@ generate-environment:
 	@echo "\
 		TRAEFIK_DASHBOARD_CREDENTIALS=\"$(TRAEFIK_DASHBOARD_CREDENTIALS)\"\n\
 		INFOMANIAK_ACCESS_TOKEN=\"$(INFOMANIAK_ACCESS_TOKEN)\"\n\
+		ANSIBLE_USER=\"$(ANSIBLE_USER)\"\n\
 	" | sed 's/^[[:space:]]*//g' > ./services/traefik/.env
 
 install-ansible:
