@@ -21,7 +21,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - /etc/localtime:/etc/localtime:ro
       - ./data/public/:/public
-      - ./data/traefik.yml:/traefik.yml:ro
+      - ./data/traefik.yaml:/traefik.yaml:ro
       - ./data/acme.json:/acme.json
     # labels:
       # - "traefik.enable=true"
@@ -39,10 +39,6 @@ services:
       # - "traefik.http.routers.traefik-secure.tls.domains[0].main={ansible.fqdn}"
       # - "traefik.http.routers.traefik-secure.tls.domains[0].sans=*.{ansible.fqdn}"
       # - "traefik.http.routers.traefik-secure.service=api@internal"
-
-# secrets:
-#   cf_api_token:
-#     file: ./cf_api_token.txt
 
 networks:
   proxy:
