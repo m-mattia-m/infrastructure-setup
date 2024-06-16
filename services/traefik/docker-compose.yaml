@@ -11,40 +11,34 @@ services:
       - proxy
     ports:
       - 80:80
-      - 8080:8080
       - 443:443
-      # - 443:443/tcp # Uncomment if you want HTTP3
-      # - 443:443/udp # Uncomment if you want HTTP3
+      - 8080:8080
     environment:
-      # CF_DNS_API_TOKEN_FILE: /run/secrets/cf_api_token # note using _FILE for docker secrets
-      # CF_DNS_API_TOKEN: ${CF_DNS_API_TOKEN} # if using .env
       TRAEFIK_DASHBOARD_CREDENTIALS: ${TRAEFIK_DASHBOARD_CREDENTIALS}
       INFOMANIAK_ACCESS_TOKEN: ${INFOMANIAK_ACCESS_TOKEN}
-    # secrets:
-    #   - cf_api_token
-    env_file: .env # use .env
+    env_file: .env
     volumes:
-      - /etc/localtime:/etc/localtime:ro
       - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /etc/localtime:/etc/localtime:ro
+      - ./data/public/:/public
       - ./data/traefik.yml:/traefik.yml:ro
       - ./data/acme.json:/acme.json
-      # - ./data/config.yml:/config.yml:ro
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.traefik.entrypoints=http"
-      - "traefik.http.routers.traefik.rule=Host(`traefik.{ansible.fqdn}`)"
-      - "traefik.http.middlewares.traefik-auth.basicauth.users=${TRAEFIK_DASHBOARD_CREDENTIALS}"
-      - "traefik.http.middlewares.traefik-https-redirect.redirectscheme.scheme=https"
-      - "traefik.http.middlewares.sslheader.headers.customrequestheaders.X-Forwarded-Proto=https"
-      - "traefik.http.routers.traefik.middlewares=traefik-https-redirect"
-      - "traefik.http.routers.traefik-secure.entrypoints=https"
-      - "traefik.http.routers.traefik-secure.rule=Host(`traefik.{ansible.fqdn}`)"
-      - "traefik.http.routers.traefik-secure.middlewares=traefik-auth"
-      - "traefik.http.routers.traefik-secure.tls=true"
-      - "traefik.http.routers.traefik-secure.tls.certresolver=infomaniak"
-      - "traefik.http.routers.traefik-secure.tls.domains[0].main={ansible.fqdn}"
-      - "traefik.http.routers.traefik-secure.tls.domains[0].sans=*.{ansible.fqdn}"
-      - "traefik.http.routers.traefik-secure.service=api@internal"
+    # labels:
+      # - "traefik.enable=true"
+      # - "traefik.http.routers.traefik.entrypoints=http"
+      # - "traefik.http.routers.traefik.rule=Host(`traefik.{ansible.fqdn}`)"
+      # - "traefik.http.middlewares.traefik-auth.basicauth.users=${TRAEFIK_DASHBOARD_CREDENTIALS}"
+      # - "traefik.http.middlewares.traefik-https-redirect.redirectscheme.scheme=https"
+      # - "traefik.http.middlewares.sslheader.headers.customrequestheaders.X-Forwarded-Proto=https"
+      # - "traefik.http.routers.traefik.middlewares=traefik-https-redirect"
+      # - "traefik.http.routers.traefik-secure.entrypoints=https"
+      # - "traefik.http.routers.traefik-secure.rule=Host(`traefik.{ansible.fqdn}`)"
+      # - "traefik.http.routers.traefik-secure.middlewares=traefik-auth"
+      # - "traefik.http.routers.traefik-secure.tls=true"
+      # - "traefik.http.routers.traefik-secure.tls.certresolver=myresolver"
+      # - "traefik.http.routers.traefik-secure.tls.domains[0].main={ansible.fqdn}"
+      # - "traefik.http.routers.traefik-secure.tls.domains[0].sans=*.{ansible.fqdn}"
+      # - "traefik.http.routers.traefik-secure.service=api@internal"
 
 # secrets:
 #   cf_api_token:

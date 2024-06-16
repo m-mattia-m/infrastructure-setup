@@ -1,0 +1,47 @@
+global:
+  checkNewVersion: false
+  sendAnonymousUsage: false
+
+log:
+  level: DEBUG
+
+api:
+  dashboard: true
+  insecure: true
+  debug: true
+
+entryPoints:
+  web: # could be replaced with 'http'
+    address: ":80"
+    http:
+      redirections:
+        entryPoint:
+          to: websecure # could be replaced with 'https'
+          scheme: https
+  websecure: # could be replaced with 'https'
+    address: ":443"
+
+serversTransport:
+  insecureSkipVerify: true
+
+providers:
+  docker:
+    exposedByDefault: false
+    endpoint: "unix:///var/run/docker.sock"
+    watch: true
+  file: # traefik checks this folder dynamically for statics files which should be public 
+    directory: ./data/public/
+    watch: true
+
+certificatesResolvers:
+  infomaniak:
+    acme:
+      email: notification@mattiamueggler.ch
+      caServer: https://acme-staging-v02.api.letsencrypt.org/directory # For testing:
+      # caServer: https://acme-v02.api.letsencrypt.org/directory # For production:
+      storage: ./data/acme.json
+      dnsChallenge:
+        provider: infomaniak
+        resolvers:
+          - "1.1.1.1:53"
+          - "9.9.9.9:53"
