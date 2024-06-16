@@ -30,7 +30,7 @@ providers:
     endpoint: "unix:///var/run/docker.sock"
     watch: true
   file: # traefik checks this folder dynamically for statics files which should be public
-    directory: ./public/
+    directory: public/
     watch: true
 
 certificatesResolvers:
@@ -39,7 +39,7 @@ certificatesResolvers:
       email: notification@mattiamueggler.ch
       caServer: https://acme-staging-v02.api.letsencrypt.org/directory # For testing:
       # caServer: https://acme-v02.api.letsencrypt.org/directory # For production:
-      storage: ./acme.json
+      storage: acme.json
       dnsChallenge:
         provider: infomaniak
         resolvers:
