@@ -23,22 +23,22 @@ services:
       - ./data/public/:/public
       - ./data/traefik.yaml:/traefik.yaml:ro
       - ./data/acme.json:/acme.json
-    # labels:
-      # - "traefik.enable=true"
-      # - "traefik.http.routers.traefik.entrypoints=http"
-      # - "traefik.http.routers.traefik.rule=Host(`traefik.{ansible.fqdn}`)"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.traefik-http.entrypoints=web" # 'web' could be 'http' if also in config file used
+      - "traefik.http.routers.traefik-http.rule=Host(`traefik.{ansible.fqdn}`)"
       # - "traefik.http.middlewares.traefik-auth.basicauth.users=${TRAEFIK_DASHBOARD_CREDENTIALS}"
       # - "traefik.http.middlewares.traefik-https-redirect.redirectscheme.scheme=https"
       # - "traefik.http.middlewares.sslheader.headers.customrequestheaders.X-Forwarded-Proto=https"
       # - "traefik.http.routers.traefik.middlewares=traefik-https-redirect"
-      # - "traefik.http.routers.traefik-secure.entrypoints=https"
-      # - "traefik.http.routers.traefik-secure.rule=Host(`traefik.{ansible.fqdn}`)"
-      # - "traefik.http.routers.traefik-secure.middlewares=traefik-auth"
-      # - "traefik.http.routers.traefik-secure.tls=true"
-      # - "traefik.http.routers.traefik-secure.tls.certresolver=myresolver"
-      # - "traefik.http.routers.traefik-secure.tls.domains[0].main={ansible.fqdn}"
-      # - "traefik.http.routers.traefik-secure.tls.domains[0].sans=*.{ansible.fqdn}"
-      # - "traefik.http.routers.traefik-secure.service=api@internal"
+      - "traefik.http.routers.traefik-https.entrypoints=websecure" # 'websecure' could be 'https' if also in config file used
+      - "traefik.http.routers.traefik-https.rule=Host(`traefik.{ansible.fqdn}`)"
+      # - "traefik.http.routers.traefik-https.middlewares=traefik-auth"
+      - "traefik.http.routers.traefik-https.tls=true"
+      - "traefik.http.routers.traefik-https.tls.certresolver=infomaniak"
+      # - "traefik.http.routers.traefik-https.tls.domains[0].main={ansible.fqdn}"
+      # - "traefik.http.routers.traefik-https.tls.domains[0].sans=*.{ansible.fqdn}"
+      # - "traefik.http.routers.traefik-https.service=api@internal"
 
 networks:
   proxy:
