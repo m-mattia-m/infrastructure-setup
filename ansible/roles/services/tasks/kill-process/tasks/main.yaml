@@ -1,11 +1,21 @@
----
-- name: Find PID of processes listening on port 80
+- name: Check if port 80 is in use
   become: true
-  ansible.builtin.shell: sudo lsof -t -i :80
-  register: pid_result
-  changed_when: false  # Since this task is read-only, mark it as unchanged
+  ansible.builtin.command: "lsof -t -i :80"
+  register: port_check
+  ignore_errors: true
+  changed_when: false
 
-- name: Kill processes with found PIDs
+- name: Debug port check result
+  ansible.builtin.debug:
+    var: port_check.stdout_lines
+
+- name: Kill process if port 80 is in use
   become: true
-  ansible.builtin.shell: sudo kill {{ pid_result.stdout }}
-  when: pid_result.stdout is defined
+  ansible.builtin.command: "kill {{ item }}"
+  with_items: "{{ port_check.stdout_lines }}"
+  when: port_check.stdout_lines is defined and port_check.stdout_lines | length > 0
+
+- name: Debug no process found on port 80
+  ansible.builtin.debug:
+    msg: "No processes found listening on port 80"
+  when: not (port_check.stdout_lines is defined and port_check.stdout_lines | length > 0)

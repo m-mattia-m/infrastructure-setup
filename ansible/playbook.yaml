@@ -2,5 +2,5 @@
 - name: Manage all private nodes
   hosts: private_hosts
   roles:
-    # - initialisation
+    - initialisation
     - services

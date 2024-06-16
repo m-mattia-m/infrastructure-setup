@@ -20,8 +20,8 @@
     placeholder: "{ansible.fqdn}"
     replacement: "{{ fqdn }}"
 
-# - name: Kill processes running on port 80
-#   ansible.builtin.include_tasks: ./kill-process/tasks/main.yaml
+- name: Kill processes running on port 80
+  ansible.builtin.include_tasks: ./kill-process/tasks/main.yaml
 
 - name: Copy environment
   vars:
