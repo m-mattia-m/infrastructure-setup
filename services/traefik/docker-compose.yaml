@@ -41,7 +41,7 @@ services:
       - "traefik.http.routers.traefik-secure.rule=Host(`traefik.{ansible.fqdn}`)"
       - "traefik.http.routers.traefik-secure.middlewares=traefik-auth"
       - "traefik.http.routers.traefik-secure.tls=true"
-      - "traefik.http.routers.traefik-secure.tls.certresolver=informaniak"
+      - "traefik.http.routers.traefik-secure.tls.certresolver=infomaniak"
       - "traefik.http.routers.traefik-secure.tls.domains[0].main={ansible.fqdn}"
       - "traefik.http.routers.traefik-secure.tls.domains[0].sans=*.{ansible.fqdn}"
       - "traefik.http.routers.traefik-secure.service=api@internal"
