@@ -6,7 +6,7 @@ services:
     networks:
       - proxy
     ports:
-      - 8080:80
+      - 8081:80
     labels:
       - "traefik.http.routers.whoami.rule=Host(`whoami.{ansible.fqdn}`)"
 
