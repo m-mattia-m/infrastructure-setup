@@ -5,7 +5,7 @@ services:
     image: docker.io/portainer/portainer-ce:2.20.3
     command: [ '--tlsskipverify' ]
     environment:
-      VIRTUAL_HOST: ${BASE_URL}
+      VIRTUAL_HOST: ${PORTAINER_BASE_URL}
       VIRTUAL_PORT: 9000 # 9000
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
