@@ -21,18 +21,47 @@
     name: proxy
 
 - name: Call 'fqdn' replacement tasks
-  ansible.builtin.include_tasks: ./replace-fqdn/tasks/main.yaml
+  ansible.builtin.include_tasks: ./replace/tasks/main.yaml
   vars:
-    target_directory: /home/{{ ansible_user }}/infrastructure/services/traefik
+    target_directory: /home/{{ ansible_user }}/infrastructure/services
     placeholder: "{ansible.fqdn}"
     replacement: "{{ fqdn }}"
 
 - name: Call 'ansible-user' replacement tasks
-  ansible.builtin.include_tasks: ./replace-ansible-user/tasks/main.yaml
+  ansible.builtin.include_tasks: ./replace/tasks/main.yaml
   vars:
-    target_directory: /home/{{ ansible_user }}/infrastructure/services/traefik
+    target_directory: /home/{{ ansible_user }}/infrastructure/services
     placeholder: "${ANSIBLE_USER}"
     replacement: "{{ ansible_user }}"
+
+- name: Call 'shlink-fqdn' replacement tasks
+  ansible.builtin.include_tasks: ./replace/tasks/main.yaml
+  vars:
+    target_directory: /home/{{ ansible_user }}/infrastructure/services
+    placeholder: "{shlink.fqdn}"
+    replacement: "l.mattiamueggler.ch"
+
+- name: Call 'shlink-fqdn-ui' replacement tasks
+  ansible.builtin.include_tasks: ./replace/tasks/main.yaml
+  vars:
+    target_directory: /home/{{ ansible_user }}/infrastructure/services
+    placeholder: "{shlink.fqdn.ui}"
+    replacement: "shlink.services..mattiamueggler.ch"
+
+- name: Call 'invoiceplane-fqdn' replacement tasks
+  ansible.builtin.include_tasks: ./replace/tasks/main.yaml
+  vars:
+    target_directory: /home/{{ ansible_user }}/infrastructure/services
+    placeholder: "{invoiceplane.fqdn}"
+    replacement: "invoiceplane.services.mattiamueggler.ch"
+
+- name: Call 'invoiceplane-fqdn' replacement tasks
+  ansible.builtin.include_tasks: ./replace/tasks/main.yaml
+  vars:
+    target_directory: /home/{{ ansible_user }}/infrastructure/services
+    placeholder: "{portainer.fqdn}"
+    replacement: "{{ fqdn }}"
+
 
 - name: Kill processes running on port 80
   ansible.builtin.include_tasks: ./kill-process/tasks/main.yaml

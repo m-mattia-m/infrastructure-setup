@@ -1,0 +1,71 @@
+version: "3.8"
+
+services:
+
+  invoiceplane:
+    hostname: invoiceplane
+    image: mhzawadi/invoiceplane:1.6.0
+    environment:
+        TZ: "Europe/Zurich"
+        MYSQL_HOST: "invoiceplane-mysql"
+        MYSQL_USER: "${INVOICEPLANE_DB_USER}"
+        MYSQL_PASSWORD: "${INVOICEPLANE_DB_PASSWORD}"
+        MYSQL_DB: "${INVOICEPLANE_DB_NAME}"
+        MYSQL_PORT: 3307
+        IP_URL: "${INVOICEPLANE_HOST}"
+        DISABLE_SETUP: false
+    depends_on:
+        - invoiceplane-mysql
+    ports:
+        - 8992:80
+    networks:
+        - proxy
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.Main== true
+      restart_policy:
+        condition: any
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.traefik-http.entrypoints=web" # 'web' could be 'http' if also in config file used
+      - "traefik.http.routers.traefik-http.rule=Host(`{invoiceplane.fqdn}`)"
+      # - "traefik.http.middlewares.traefik-auth.basicauth.users=${TRAEFIK_DASHBOARD_CREDENTIALS}"
+      # - "traefik.http.middlewares.traefik-https-redirect.redirectscheme.scheme=https"
+      # - "traefik.http.middlewares.sslheader.headers.customrequestheaders.X-Forwarded-Proto=https"
+      # - "traefik.http.routers.traefik.middlewares=traefik-https-redirect"
+      - "traefik.http.routers.traefik-https.entrypoints=websecure" # 'websecure' could be 'https' if also in config file used
+      - "traefik.http.routers.traefik-https.rule=Host(`{invoiceplane.fqdn}`)"
+      # - "traefik.http.routers.traefik-https.middlewares=traefik-auth"
+      - "traefik.http.routers.traefik-https.tls=true"
+      - "traefik.http.routers.traefik-https.tls.certresolver=infomaniak"
+      # - "traefik.http.routers.traefik-https.tls.domains[0].main={invoiceplane.fqdn}"
+      # - "traefik.http.routers.traefik-https.tls.domains[0].sans=*.{invoiceplane.fqdn}"
+      # - "traefik.http.routers.traefik-https.service=api@internal"
+
+  invoiceplane-mysql:
+    image: mysql:8.0
+    container_name: invoiceplane-mysql
+    restart: always
+    networks:
+      - proxy
+    ports:
+     - '3307:3306'
+    environment:
+      MYSQL_DATABASE: "${INVOICEPLANE_DB_NAME}"
+      MYSQL_RANDOM_ROOT_PASSWORD: true
+      MYSQL_USER: "${INVOICEPLANE_DB_USER}"
+      MYSQL_PASSWORD: "${INVOICEPLANE_DB_PASSWORD}"
+    volumes:
+      - db:/var/lib/mysql
+
+volumes:
+  dbdata:
+  db:
+    driver: local
+
+networks:
+  proxy:
+    external: true

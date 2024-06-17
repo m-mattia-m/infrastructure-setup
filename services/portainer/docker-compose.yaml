@@ -1,0 +1,49 @@
+version: "3.8"
+
+services:
+  portainer:
+    image: docker.io/portainer/portainer-ce:2.20.3
+    command: [ '--tlsskipverify' ]
+    environment:
+      VIRTUAL_HOST: ${BASE_URL}
+      VIRTUAL_PORT: 9000 # 9000
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - portainer-data:/data
+    ports:
+      # WEB
+      - "9443:9443" # "9443:9443"
+      # WEB (Insecure) - don't open per default
+      # - "9000:9000"
+      # EDGE AGENT
+      - "8000:8000"
+    networks:
+      - proxy
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.traefik-http.entrypoints=web" # 'web' could be 'http' if also in config file used
+      - "traefik.http.routers.traefik-http.rule=Host(`portainer.{portainer.fqdn}`)"
+      # - "traefik.http.middlewares.traefik-auth.basicauth.users=${TRAEFIK_DASHBOARD_CREDENTIALS}"
+      # - "traefik.http.middlewares.traefik-https-redirect.redirectscheme.scheme=https"
+      # - "traefik.http.middlewares.sslheader.headers.customrequestheaders.X-Forwarded-Proto=https"
+      # - "traefik.http.routers.traefik.middlewares=traefik-https-redirect"
+      - "traefik.http.routers.traefik-https.entrypoints=websecure" # 'websecure' could be 'https' if also in config file used
+      - "traefik.http.routers.traefik-https.rule=Host(`portainer.{portainer.fqdn}`)"
+      # - "traefik.http.routers.traefik-https.middlewares=traefik-auth"
+      - "traefik.http.routers.traefik-https.tls=true"
+      - "traefik.http.routers.traefik-https.tls.certresolver=infomaniak"
+      # - "traefik.http.routers.traefik-https.tls.domains[0].main=portainer.{portainer.fqdn}"
+      # - "traefik.http.routers.traefik-https.tls.domains[0].sans=*.{portainer.fqdn}"
+      # - "traefik.http.routers.traefik-https.service=api@internal"
+    hostname: portainer
+    container_name: portainer
+    restart: always
+
+volumes:
+  portainer-data: {}
+
+networks:
+  public:
+    internal: false
+  caddy:
+    external: true

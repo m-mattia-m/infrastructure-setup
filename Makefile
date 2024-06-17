@@ -17,6 +17,28 @@ generate-environment:
 		TRAEFIK_DASHBOARD_CREDENTIALS=\"$(TRAEFIK_DASHBOARD_CREDENTIALS)\"\n\
 		INFOMANIAK_ACCESS_TOKEN=\"$(INFOMANIAK_ACCESS_TOKEN)\"\n\
 	" | sed 's/^[[:space:]]*//g' > ./services/traefik/.env
+	@echo "------------- Set shlink environment -------------"
+	@echo "\
+		SHLINK_FQDN=\"$(SHLINK_FQDN)\"\n\
+		SHLINK_DB_NAME=\"$(SHLINK_DB_NAME)\"\n\
+		SHLINK_DB_USER=\"$(SHLINK_DB_USER)\"\n\
+		SHLINK_DB_PASSWORD=\"$(SHLINK_DB_PASSWORD)\"\n\
+		SHLINK_GEOLITE_LICENSE_KEY=\"$(SHLINK_GEOLITE_LICENSE_KEY)\"\n\
+		SHLINK_INITIAL_API_KEY=\"$(SHLINK_INITIAL_API_KEY)\"\n\
+		SHLINK_SERVER_URL=\"$(SHLINK_SERVER_URL)\"\n\
+	" | sed 's/^[[:space:]]*//g' > ./services/shlink/.env
+	@echo "--------- Set invoiceplane environment -----------"
+	@echo "\
+		INVOICEPLANE_HOST=\"$(INVOICEPLANE_HOST)\"\n\
+		INVOICEPLANE_DB_USER=\"$(INVOICEPLANE_DB_USER)\"\n\
+		INVOICEPLANE_DB_PASSWORD=\"$(INVOICEPLANE_DB_PASSWORD)\"\n\
+		INVOICEPLANE_DB_NAME=\"$(INVOICEPLANE_DB_NAME)\"\n\
+	" | sed 's/^[[:space:]]*//g' > ./services/invoiceplane/.env
+	@echo "----------- Set portainer environment ------------"
+	@echo "\
+		PORTAINER_BASE_URL=\"$(PORTAINER_BASE_URL)\"\n\
+	" | sed 's/^[[:space:]]*//g' > ./services/portainer/.env
+
 
 install-ansible:
 	@echo "--------------------------------------------------"

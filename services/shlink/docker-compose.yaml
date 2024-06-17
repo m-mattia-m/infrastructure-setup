@@ -1,0 +1,117 @@
+version: "3.8"
+
+services:
+
+  shlink:
+    hostname: shlink
+    image: shlinkio/shlink:stable
+    ports:
+      - "8991:8080"
+    environment:
+      TZ: "Europe/Zurich"
+      PUID: 1000
+      PGID: 1000
+      DEFAULT_DOMAIN: '${SHLINK_FQDN}'
+      IS_HTTPS_ENABLED: 'false'
+      GEOLITE_LICENSE_KEY: '${SHLINK_GEOLITE_LICENSE_KEY}'
+      DB_DRIVER: 'mysql'
+      DB_NAME: '${SHLINK_DB_NAME}'
+      DB_HOST: 'shlink-mysql'
+      DB_PORT: '3306'
+      DB_USER: '${SHLINK_DB_USER}'
+      DB_PASSWORD: '${SHLINK_DB_PASSWORD}'
+      MEMORY_LIMIT: '256M'
+      INITIAL_API_KEY: '${SHLINK_INITIAL_API_KEY}' # an API key that will be created once during container start-up
+    networks:
+      - proxy
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.Main == true
+      restart_policy:
+        condition: any
+    depends_on:
+        - shlink-mysql
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.traefik-http.entrypoints=web" # 'web' could be 'http' if also in config file used
+      - "traefik.http.routers.traefik-http.rule=Host(`{shlink.fqdn}`)"
+      # - "traefik.http.middlewares.traefik-auth.basicauth.users=${TRAEFIK_DASHBOARD_CREDENTIALS}"
+      # - "traefik.http.middlewares.traefik-https-redirect.redirectscheme.scheme=https"
+      # - "traefik.http.middlewares.sslheader.headers.customrequestheaders.X-Forwarded-Proto=https"
+      # - "traefik.http.routers.traefik.middlewares=traefik-https-redirect"
+      - "traefik.http.routers.traefik-https.entrypoints=websecure" # 'websecure' could be 'https' if also in config file used
+      - "traefik.http.routers.traefik-https.rule=Host(`{shlink.fqdn}`)"
+      # - "traefik.http.routers.traefik-https.middlewares=traefik-auth"
+      - "traefik.http.routers.traefik-https.tls=true"
+      - "traefik.http.routers.traefik-https.tls.certresolver=infomaniak"
+      # - "traefik.http.routers.traefik-https.tls.domains[0].main={shlink.fqdn}"
+      # - "traefik.http.routers.traefik-https.tls.domains[0].sans=*.{shlink.fqdn}"
+      # - "traefik.http.routers.traefik-https.service=api@internal"
+
+  shlink-web-client:
+    hostname: shlink-web-client
+    image: shlinkio/shlink-web-client:stable
+    environment:
+        TZ: "Europe/Zurich"
+        PUID: 1000
+        PGID: 1000
+        SHLINK_SERVER_URL: "${SHLINK_SERVER_URL}"
+        SHLINK_SERVER_API_KEY: "${SHLINK_INITIAL_API_KEY}"
+    depends_on:
+        - shlink
+    ports:
+        - 8990:8080
+    networks:
+        - proxy
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.Main== true
+      restart_policy:
+        condition: any
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.traefik-http.entrypoints=web" # 'web' could be 'http' if also in config file used
+      - "traefik.http.routers.traefik-http.rule=Host(`{shlink.fqdn.ui}`)"
+      # - "traefik.http.middlewares.traefik-auth.basicauth.users=${TRAEFIK_DASHBOARD_CREDENTIALS}"
+      # - "traefik.http.middlewares.traefik-https-redirect.redirectscheme.scheme=https"
+      # - "traefik.http.middlewares.sslheader.headers.customrequestheaders.X-Forwarded-Proto=https"
+      # - "traefik.http.routers.traefik.middlewares=traefik-https-redirect"
+      - "traefik.http.routers.traefik-https.entrypoints=websecure" # 'websecure' could be 'https' if also in config file used
+      - "traefik.http.routers.traefik-https.rule=Host(`{shlink.fqdn.ui}`)"
+      # - "traefik.http.routers.traefik-https.middlewares=traefik-auth"
+      - "traefik.http.routers.traefik-https.tls=true"
+      - "traefik.http.routers.traefik-https.tls.certresolver=infomaniak"
+      # - "traefik.http.routers.traefik-https.tls.domains[0].main={shlink.fqdn.ui}"
+      # - "traefik.http.routers.traefik-https.tls.domains[0].sans=*.{shlink.fqdn.ui}"
+      # - "traefik.http.routers.traefik-https.service=api@internal"
+
+  shlink-mysql:
+    image: mysql:8.0
+    container_name: shlink-mysql
+    restart: always
+    networks:
+      - proxy
+    ports:
+     - '3306:3306'
+    environment:
+      MYSQL_DATABASE: "${SHLINK_DB_NAME}"
+      MYSQL_RANDOM_ROOT_PASSWORD: true
+      MYSQL_USER: "${SHLINK_DB_USER}"
+      MYSQL_PASSWORD: ${SHLINK_DB_PASSWORD}
+    volumes:
+      - db:/var/lib/mysql
+
+volumes:
+  dbdata:
+  db:
+    driver: local
+
+networks:
+  proxy:
+    external: true
