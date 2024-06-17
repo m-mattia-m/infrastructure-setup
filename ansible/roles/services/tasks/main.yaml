@@ -46,7 +46,7 @@
   vars:
     target_directory: /home/{{ ansible_user }}/infrastructure/services
     placeholder: "{shlink.fqdn.ui}"
-    replacement: "shlink.services..mattiamueggler.ch"
+    replacement: "shlink.services.mattiamueggler.ch"
 
 - name: Call 'invoiceplane-fqdn' replacement tasks
   ansible.builtin.include_tasks: ./replace/tasks/main.yaml
@@ -55,7 +55,7 @@
     placeholder: "{invoiceplane.fqdn}"
     replacement: "invoiceplane.services.mattiamueggler.ch"
 
-- name: Call 'invoiceplane-fqdn' replacement tasks
+- name: Call 'portainer-fqdn' replacement tasks
   ansible.builtin.include_tasks: ./replace/tasks/main.yaml
   vars:
     target_directory: /home/{{ ansible_user }}/infrastructure/services
