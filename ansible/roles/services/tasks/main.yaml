@@ -62,7 +62,6 @@
     placeholder: "{portainer.fqdn}"
     replacement: "{{ fqdn }}"
 
-
 - name: Kill processes running on port 80
   ansible.builtin.include_tasks: ./kill-process/tasks/main.yaml
 
@@ -85,3 +84,23 @@
   become: true
   community.docker.docker_compose_v2:
     project_src: /home/{{ ansible_user }}/infrastructure/services/traefik
+
+- name: Start whoami
+  become: true
+  community.docker.docker_compose_v2:
+    project_src: /home/{{ ansible_user }}/infrastructure/services/whoami
+
+- name: Start portainer
+  become: true
+  community.docker.docker_compose_v2:
+    project_src: /home/{{ ansible_user }}/infrastructure/services/portainer
+
+- name: Start shlink
+  become: true
+  community.docker.docker_compose_v2:
+    project_src: /home/{{ ansible_user }}/infrastructure/services/shlink
+
+- name: Start invoiceplane
+  become: true
+  community.docker.docker_compose_v2:
+    project_src: /home/{{ ansible_user }}/infrastructure/services/invoiceplane
