@@ -106,12 +106,12 @@ services:
       MYSQL_USER: "${SHLINK_DB_USER}"
       MYSQL_PASSWORD: ${SHLINK_DB_PASSWORD}
     volumes:
-      - db:/var/lib/mysql
+      - shlinkdb:/var/lib/mysql
     labels:
       - "traefik.enable=false"
 
 volumes:
-  db:
+  shlinkdb:
     driver: local
 
 networks:

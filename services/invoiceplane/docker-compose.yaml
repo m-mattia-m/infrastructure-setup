@@ -58,13 +58,12 @@ services:
       MYSQL_USER: "${INVOICEPLANE_DB_USER}"
       MYSQL_PASSWORD: "${INVOICEPLANE_DB_PASSWORD}"
     volumes:
-      - db:/var/lib/mysql
+      - invoiceplanedb:/var/lib/mysql
     labels:
       - "traefik.enable=false"
 
 volumes:
-  dbdata:
-  db:
+  invoiceplanedb:
     driver: local
 
 networks:
