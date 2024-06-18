@@ -37,8 +37,8 @@ certificatesResolvers:
   infomaniak:
     acme:
       email: notification@mattiamueggler.ch
-      caServer: https://acme-staging-v02.api.letsencrypt.org/directory # For testing:
-      # caServer: https://acme-v02.api.letsencrypt.org/directory # For production:
+      # caServer: https://acme-staging-v02.api.letsencrypt.org/directory # For testing:
+      caServer: https://acme-v02.api.letsencrypt.org/directory # For production:
       storage: acme.json
       dnsChallenge:
         provider: infomaniak
