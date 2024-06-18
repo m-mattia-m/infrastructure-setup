@@ -1,10 +1,9 @@
-version: "3.8"
-
 services:
 
   shlink:
     hostname: shlink
     image: shlinkio/shlink:stable
+    restart: unless-stopped
     ports:
       - "8991:8080"
     environment:
@@ -24,14 +23,14 @@ services:
       INITIAL_API_KEY: '${SHLINK_INITIAL_API_KEY}' # an API key that will be created once during container start-up
     networks:
       - proxy
-    deploy:
-      mode: replicated
-      replicas: 1
-      placement:
-        constraints:
-          - node.labels.Main == true
-      restart_policy:
-        condition: any
+    # deploy:
+    #   mode: replicated
+    #   replicas: 1
+    #   placement:
+    #     constraints:
+    #       - node.labels.Main == true
+    # restart_policy:
+    #   condition: any
     depends_on:
         - shlink-mysql
     labels:
@@ -66,35 +65,36 @@ services:
         - 8990:8080
     networks:
         - proxy
-    deploy:
-      mode: replicated
-      replicas: 1
-      placement:
-        constraints:
-          - node.labels.Main== true
-      restart_policy:
-        condition: any
+    restart: unless-stopped
+    # deploy:
+    #   mode: replicated
+    #   replicas: 1
+    #   placement:
+    #     constraints:
+    #       - node.labels.Main== true
+    #   restart_policy:
+    #     condition: any
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.traefik-http.entrypoints=web" # 'web' could be 'http' if also in config file used
       - "traefik.http.routers.traefik-http.rule=Host(`{shlink.fqdn.ui}`)"
       # - "traefik.http.middlewares.traefik-auth.basicauth.users=${TRAEFIK_DASHBOARD_CREDENTIALS}"
-      # - "traefik.http.middlewares.traefik-https-redirect.redirectscheme.scheme=https"
-      # - "traefik.http.middlewares.sslheader.headers.customrequestheaders.X-Forwarded-Proto=https"
-      # - "traefik.http.routers.traefik.middlewares=traefik-https-redirect"
+      - "traefik.http.middlewares.traefik-https-redirect.redirectscheme.scheme=https"
+      - "traefik.http.middlewares.sslheader.headers.customrequestheaders.X-Forwarded-Proto=https"
+      - "traefik.http.routers.traefik.middlewares=traefik-https-redirect"
       - "traefik.http.routers.traefik-https.entrypoints=websecure" # 'websecure' could be 'https' if also in config file used
       - "traefik.http.routers.traefik-https.rule=Host(`{shlink.fqdn.ui}`)"
       # - "traefik.http.routers.traefik-https.middlewares=traefik-auth"
       - "traefik.http.routers.traefik-https.tls=true"
       - "traefik.http.routers.traefik-https.tls.certresolver=infomaniak"
-      # - "traefik.http.routers.traefik-https.tls.domains[0].main={shlink.fqdn.ui}"
-      # - "traefik.http.routers.traefik-https.tls.domains[0].sans=*.{shlink.fqdn.ui}"
-      # - "traefik.http.routers.traefik-https.service=api@internal"
+      - "traefik.http.routers.traefik-https.tls.domains[0].main={shlink.fqdn.ui}"
+      - "traefik.http.routers.traefik-https.tls.domains[0].sans=*.{shlink.fqdn.ui}"
+      - "traefik.http.routers.traefik-https.service=api@internal"
 
   shlink-mysql:
     image: mysql:8.4
     container_name: shlink-mysql
-    restart: always
+    restart: unless-stopped
     networks:
       - proxy
     ports:
@@ -107,6 +107,8 @@ services:
       MYSQL_PASSWORD: ${SHLINK_DB_PASSWORD}
     volumes:
       - db:/var/lib/mysql
+    labels:
+      - "traefik.enable=false"
 
 volumes:
   db:
