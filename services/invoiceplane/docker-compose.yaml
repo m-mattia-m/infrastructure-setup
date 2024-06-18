@@ -29,20 +29,20 @@ services:
       #   condition: any
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.traefik-http.entrypoints=web" # 'web' could be 'http' if also in config file used
-      - "traefik.http.routers.traefik-http.rule=Host(`{invoiceplane.fqdn}`)"
+      - "traefik.http.routers.invoiceplane-http.entrypoints=web" # 'web' could be 'http' if also in config file used
+      - "traefik.http.routers.invoiceplane-http.rule=Host(`{invoiceplane.fqdn}`)"
       # - "traefik.http.middlewares.traefik-auth.basicauth.users=${TRAEFIK_DASHBOARD_CREDENTIALS}"
-      - "traefik.http.middlewares.traefik-https-redirect.redirectscheme.scheme=https"
+      - "traefik.http.middlewares.invoiceplane-https-redirect.redirectscheme.scheme=https"
       - "traefik.http.middlewares.sslheader.headers.customrequestheaders.X-Forwarded-Proto=https"
-      - "traefik.http.routers.traefik.middlewares=traefik-https-redirect"
-      - "traefik.http.routers.traefik-https.entrypoints=websecure" # 'websecure' could be 'https' if also in config file used
-      - "traefik.http.routers.traefik-https.rule=Host(`{invoiceplane.fqdn}`)"
-      # - "traefik.http.routers.traefik-https.middlewares=traefik-auth"
-      - "traefik.http.routers.traefik-https.tls=true"
-      - "traefik.http.routers.traefik-https.tls.certresolver=infomaniak"
-      - "traefik.http.routers.traefik-https.tls.domains[0].main={invoiceplane.fqdn}"
-      - "traefik.http.routers.traefik-https.tls.domains[0].sans=*.{invoiceplane.fqdn}"
-      - "traefik.http.routers.traefik-https.service=api@internal"
+      - "traefik.http.routers.invoiceplane-https.middlewares=invoiceplane-https-redirect"
+      - "traefik.http.routers.invoiceplane-https.entrypoints=websecure" # 'websecure' could be 'https' if also in config file used
+      - "traefik.http.routers.invoiceplane-https.rule=Host(`{invoiceplane.fqdn}`)"
+      # - "traefik.http.routers.invoiceplane-https.middlewares=traefik-auth"
+      - "traefik.http.routers.invoiceplane-https.tls=true"
+      - "traefik.http.routers.invoiceplane-https.tls.certresolver=infomaniak"
+      - "traefik.http.routers.invoiceplane-https.tls.domains[0].main={invoiceplane.fqdn}"
+      - "traefik.http.routers.invoiceplane-https.tls.domains[0].sans=*.{invoiceplane.fqdn}"
+      - "traefik.http.routers.invoiceplane-https.service=api@internal"
 
   invoiceplane-mysql:
     image: mysql:8.0

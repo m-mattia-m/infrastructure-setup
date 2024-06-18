@@ -28,7 +28,7 @@ services:
       # - "traefik.http.middlewares.traefik-auth.basicauth.users=${TRAEFIK_DASHBOARD_CREDENTIALS}"
       - "traefik.http.middlewares.traefik-https-redirect.redirectscheme.scheme=https"
       - "traefik.http.middlewares.sslheader.headers.customrequestheaders.X-Forwarded-Proto=https"
-      - "traefik.http.routers.traefik.middlewares=traefik-https-redirect"
+      - "traefik.http.routers.traefik-https.middlewares=traefik-https-redirect"
       - "traefik.http.routers.traefik-https.entrypoints=websecure" # 'websecure' could be 'https' if also in config file used
       - "traefik.http.routers.traefik-https.rule=Host(`traefik.{ansible.fqdn}`)"
       # - "traefik.http.routers.traefik-https.middlewares=traefik-auth"
