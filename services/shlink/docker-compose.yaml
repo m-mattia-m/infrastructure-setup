@@ -91,8 +91,9 @@ services:
       - "traefik.http.routers.shlink-web-https.tls.domains[0].sans=*.{shlink.fqdn.ui}"
       - "traefik.http.routers.shlink-web-https.service=api@internal"
 
+
   shlink-mysql:
-    image: mysql:8.4
+    image: mysql:8.0
     container_name: shlink-mysql
     restart: unless-stopped
     networks:
@@ -102,16 +103,16 @@ services:
     command: --default-authentication-plugin=mysql_native_password
     environment:
       MYSQL_DATABASE: "${SHLINK_DB_NAME}"
-      MYSQL_RANDOM_ROOT_PASSWORD: true
+      MYSQL_RANDOM_ROOT_PASSWORD: 'true'
       MYSQL_USER: "${SHLINK_DB_USER}"
-      MYSQL_PASSWORD: ${SHLINK_DB_PASSWORD}
+      MYSQL_PASSWORD: "${SHLINK_DB_PASSWORD}"
     volumes:
-      - shlinkdb:/var/lib/mysql
+      - shlink_db:/var/lib/mysql
     labels:
       - "traefik.enable=false"
 
 volumes:
-  shlinkdb:
+  shlink_db:
     driver: local
 
 networks:

@@ -51,19 +51,20 @@ services:
     networks:
       - proxy
     ports:
-     - '3307:3306'
+     - '3306:3306'
+    command: --default-authentication-plugin=mysql_native_password
     environment:
       MYSQL_DATABASE: "${INVOICEPLANE_DB_NAME}"
-      MYSQL_RANDOM_ROOT_PASSWORD: true
+      MYSQL_RANDOM_ROOT_PASSWORD: 'true'
       MYSQL_USER: "${INVOICEPLANE_DB_USER}"
       MYSQL_PASSWORD: "${INVOICEPLANE_DB_PASSWORD}"
     volumes:
-      - invoiceplanedb:/var/lib/mysql
+      - invoiceplane_db:/var/lib/mysql
     labels:
       - "traefik.enable=false"
 
 volumes:
-  invoiceplanedb:
+  invoiceplane_db:
     driver: local
 
 networks:
