@@ -52,7 +52,6 @@ services:
       - proxy
     ports:
      - '3307:3306'
-    command: --default-authentication-plugin=mysql_native_password
     environment:
       MYSQL_DATABASE: "${INVOICEPLANE_DB_NAME}"
       MYSQL_RANDOM_ROOT_PASSWORD: 'true'
@@ -65,7 +64,6 @@ services:
 
 volumes:
   invoiceplane_db:
-    driver: local
 
 networks:
   proxy:

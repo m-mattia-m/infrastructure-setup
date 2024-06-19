@@ -100,7 +100,6 @@ services:
       - proxy
     ports:
      - '3306:3306'
-    command: --default-authentication-plugin=mysql_native_password
     environment:
       MYSQL_DATABASE: "${SHLINK_DB_NAME}"
       MYSQL_RANDOM_ROOT_PASSWORD: 'true'
@@ -113,7 +112,6 @@ services:
 
 volumes:
   shlink_db:
-    driver: local
 
 networks:
   proxy:
