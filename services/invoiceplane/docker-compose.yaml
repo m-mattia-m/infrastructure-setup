@@ -6,7 +6,7 @@ services:
     restart: unless-stopped
     environment:
         TZ: "Europe/Zurich"
-        MYSQL_HOST: "invoiceplane-mysql"
+        MYSQL_HOST: "invoiceplane_mysql"
         MYSQL_USER: "${INVOICEPLANE_DB_USER}"
         MYSQL_PASSWORD: "${INVOICEPLANE_DB_PASSWORD}"
         MYSQL_DB: "${INVOICEPLANE_DB_NAME}"
@@ -14,7 +14,7 @@ services:
         IP_URL: "${INVOICEPLANE_HOST}"
         DISABLE_SETUP: false
     depends_on:
-        - invoiceplane-mysql
+        - invoiceplane_mysql
     ports:
         - 8992:80
     networks:
@@ -33,9 +33,10 @@ services:
       - "traefik.http.routers.invoiceplane-https.tls=true"
       - "traefik.http.routers.invoiceplane-https.tls.certresolver=infomaniak"
 
-  invoiceplane-mysql:
+  invoiceplane_mysql:
     image: mysql:8.0
-    container_name: invoiceplane-mysql
+    container_name: invoiceplane_mysql
+    hostname: invoiceplane_mysql
     restart: unless-stopped
     networks:
       - proxy

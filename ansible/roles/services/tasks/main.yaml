@@ -67,8 +67,8 @@
   vars:
     target_directory: /home/{{ ansible_user }}/infrastructure/services
     placeholder: "${caServer}"
-    replacement: "https://acme-v02.api.letsencrypt.org/directory" # For production
-    # replacement: "https://acme-staging-v02.api.letsencrypt.org/directory" # For testing
+    replacement: "https://acme-staging-v02.api.letsencrypt.org/directory" # For testing
+    # replacement: "https://acme-v02.api.letsencrypt.org/directory" # For production
 
 - name: Kill processes running on port 80
   ansible.builtin.include_tasks: ./kill-process/tasks/main.yaml
