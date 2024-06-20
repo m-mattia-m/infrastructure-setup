@@ -23,32 +23,19 @@ services:
       INITIAL_API_KEY: '${SHLINK_INITIAL_API_KEY}' # an API key that will be created once during container start-up
     networks:
       - proxy
-    # deploy:
-    #   mode: replicated
-    #   replicas: 1
-    #   placement:
-    #     constraints:
-    #       - node.labels.Main == true
-    # restart_policy:
-    #   condition: any
     depends_on:
         - shlink-mysql
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.shlink-backend-http.entrypoints=web" # 'web' could be 'http' if also in config file used
       - "traefik.http.routers.shlink-backend-http.rule=Host(`{shlink.fqdn}`)"
-      # - "traefik.http.middlewares.traefik-auth.basicauth.users=${TRAEFIK_DASHBOARD_CREDENTIALS}"
-      # - "traefik.http.middlewares.shlink-backend-https-redirect.redirectscheme.scheme=https"
-      # - "traefik.http.middlewares.sslheader.headers.customrequestheaders.X-Forwarded-Proto=https"
-      # - "traefik.http.routers.shlink-backend-http.middlewares=shlink-backend-https-redirect"
+      - "traefik.http.middlewares.shlink-backend-https-redirect.redirectscheme.scheme=https"
+      - "traefik.http.middlewares.sslheader.headers.customrequestheaders.X-Forwarded-Proto=https"
+      - "traefik.http.routers.shlink-backend-https.middlewares=shlink-backend-https-redirect"
       - "traefik.http.routers.shlink-backend-https.entrypoints=websecure" # 'websecure' could be 'https' if also in config file used
       - "traefik.http.routers.shlink-backend-https.rule=Host(`{shlink.fqdn}`)"
-      # - "traefik.http.routers.shlink-backend-https.middlewares=traefik-auth"
       - "traefik.http.routers.shlink-backend-https.tls=true"
       - "traefik.http.routers.shlink-backend-https.tls.certresolver=infomaniak"
-      # - "traefik.http.routers.shlink-backend-https.tls.domains[0].main={shlink.fqdn}"
-      # - "traefik.http.routers.shlink-backend-https.tls.domains[0].sans=*.{shlink.fqdn}"
-      # - "traefik.http.routers.shlink-backend-https.service=api@internal"
 
   shlink-web-client:
     hostname: shlink-web-client
@@ -66,30 +53,17 @@ services:
     networks:
         - proxy
     restart: unless-stopped
-    # deploy:
-    #   mode: replicated
-    #   replicas: 1
-    #   placement:
-    #     constraints:
-    #       - node.labels.Main== true
-    #   restart_policy:
-    #     condition: any
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.shlink-web-http.entrypoints=web" # 'web' could be 'http' if also in config file used
-      - "traefik.http.routers.shlink-web-http.rule=Host(`{shlink.fqdn.ui}`)"
-      # - "traefik.http.middlewares.traefik-auth.basicauth.users=${TRAEFIK_DASHBOARD_CREDENTIALS}"
-      - "traefik.http.middlewares.shlink-web-https-redirect.redirectscheme.scheme=https"
+      - "traefik.http.routers.shlink-ui-http.entrypoints=web" # 'web' could be 'http' if also in config file used
+      - "traefik.http.routers.shlink-ui-http.rule=Host(`{shlink.fqdn.ui}`)"
+      - "traefik.http.middlewares.shlink-ui-https-redirect.redirectscheme.scheme=https"
       - "traefik.http.middlewares.sslheader.headers.customrequestheaders.X-Forwarded-Proto=https"
-      - "traefik.http.routers.shlink-web-https.middlewares=shlink-web-https-redirect"
-      - "traefik.http.routers.shlink-web-https.entrypoints=websecure" # 'websecure' could be 'https' if also in config file used
-      - "traefik.http.routers.shlink-web-https.rule=Host(`{shlink.fqdn.ui}`)"
-      # - "traefik.http.routers.shlink-web-https.middlewares=traefik-auth"
-      - "traefik.http.routers.shlink-web-https.tls=true"
-      - "traefik.http.routers.shlink-web-https.tls.certresolver=infomaniak"
-      - "traefik.http.routers.shlink-web-https.tls.domains[0].main={shlink.fqdn.ui}"
-      - "traefik.http.routers.shlink-web-https.tls.domains[0].sans=*.{shlink.fqdn.ui}"
-      - "traefik.http.routers.shlink-web-https.service=api@internal"
+      - "traefik.http.routers.shlink-ui-https.middlewares=shlink-ui-https-redirect"
+      - "traefik.http.routers.shlink-ui-https.entrypoints=websecure" # 'websecure' could be 'https' if also in config file used
+      - "traefik.http.routers.shlink-ui-https.rule=Host(`{shlink.fqdn.ui}`)"
+      - "traefik.http.routers.shlink-ui-https.tls=true"
+      - "traefik.http.routers.shlink-ui-https.tls.certresolver=infomaniak"
 
 
   shlink-mysql:

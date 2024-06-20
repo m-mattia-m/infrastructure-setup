@@ -2,6 +2,9 @@ services:
   portainer:
     image: docker.io/portainer/portainer-ce:2.20.3
     command: [ '--tlsskipverify' ]
+    hostname: portainer
+    container_name: portainer
+    restart: unless-stopped
     environment:
       VIRTUAL_HOST: ${PORTAINER_BASE_URL}
       VIRTUAL_PORT: 9000 # 9000
@@ -30,12 +33,7 @@ services:
       # - "traefik.http.routers.portainer-https.middlewares=traefik-auth"
       - "traefik.http.routers.portainer-https.tls=true"
       - "traefik.http.routers.portainer-https.tls.certresolver=infomaniak"
-      - "traefik.http.routers.portainer-https.tls.domains[0].main=portainer.{portainer.fqdn}"
-      - "traefik.http.routers.portainer-https.tls.domains[0].sans=*.{portainer.fqdn}"
-      - "traefik.http.routers.portainer-https.service=api@internal"
-    hostname: portainer
-    container_name: portainer
-    restart: unless-stopped
+
 
 volumes:
   portainer-data: {}

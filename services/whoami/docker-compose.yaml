@@ -8,7 +8,16 @@ services:
     ports:
       - 8081:80
     labels:
-      - "traefik.http.routers.whoami.rule=Host(`whoami.{ansible.fqdn}`)"
+      - "traefik.enable=true"
+      - "traefik.http.routers.whoami-http.entrypoints=web" # 'web' could be 'http' if also in config file used
+      - "traefik.http.routers.whoami-http.rule=Host(`whoami.{ansible.fqdn}`)"
+      - "traefik.http.middlewares.whoami-https-redirect.redirectscheme.scheme=https"
+      - "traefik.http.middlewares.sslheader.headers.customrequestheaders.X-Forwarded-Proto=https"
+      - "traefik.http.routers.whoami-https.middlewares=whoami-https-redirect"
+      - "traefik.http.routers.whoami-https.entrypoints=websecure" # 'websecure' could be 'https' if also in config file used
+      - "traefik.http.routers.whoami-https.rule=Host(`whoami.{ansible.fqdn}`)"
+      - "traefik.http.routers.whoami-https.tls=true"
+      - "traefik.http.routers.whoami-https.tls.certresolver=infomaniak"
 
 networks:
   proxy:

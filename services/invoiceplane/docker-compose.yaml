@@ -19,14 +19,6 @@ services:
         - 8992:80
     networks:
         - proxy
-    deploy:
-      # mode: replicated
-      # replicas: 1
-      # placement:
-      #   constraints:
-      #     - node.labels.Main== true
-      # restart_policy:
-      #   condition: any
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.invoiceplane-http.entrypoints=web" # 'web' could be 'http' if also in config file used
@@ -40,9 +32,6 @@ services:
       # - "traefik.http.routers.invoiceplane-https.middlewares=traefik-auth"
       - "traefik.http.routers.invoiceplane-https.tls=true"
       - "traefik.http.routers.invoiceplane-https.tls.certresolver=infomaniak"
-      - "traefik.http.routers.invoiceplane-https.tls.domains[0].main={invoiceplane.fqdn}"
-      - "traefik.http.routers.invoiceplane-https.tls.domains[0].sans=*.{invoiceplane.fqdn}"
-      - "traefik.http.routers.invoiceplane-https.service=api@internal"
 
   invoiceplane-mysql:
     image: mysql:8.0
