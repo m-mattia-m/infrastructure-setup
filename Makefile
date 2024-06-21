@@ -41,6 +41,7 @@ generate-environment:
 	@echo "------------ Set backup environment --------------"
 	@echo "\
 		BACKUP_S3_HOST=\"$(BACKUP_S3_HOST)\"\n\
+		BACKUP_S3_REGION=\"$(BACKUP_S3_REGION)\"\n\
 		BACKUP_S3_BUCKET_NAME=\"$(BACKUP_S3_BUCKET_NAME)\"\n\
 		BACKUP_S3_KEY_ID=\"$(BACKUP_S3_KEY_ID)\"\n\
 		BACKUP_S3_ACCESS_KEY=\"$(BACKUP_S3_ACCESS_KEY)\"\n\
