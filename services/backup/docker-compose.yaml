@@ -11,6 +11,8 @@ services:
       - invoiceplane_db:/backup/invoiceplane_db:ro
       - openvpn:/backup/openvpn:ro
       - portainer_data:/backup/portainer_data:ro
+    labels:
+      - "traefik.enable=false"
 
 volumes:
   shlink_db:

@@ -34,6 +34,8 @@ services:
       - "traefik.http.routers.invoiceplane-https.tls.certresolver=infomaniak"
       - "traefik.http.middlewares.invoiceplane-http.ipwhitelist.sourcerange=${remote.host.ip}"
       - "traefik.http.middlewares.invoiceplane-https.ipwhitelist.sourcerange=${remote.host.ip}"
+      - "traefik.http.routers.invoiceplane-https.middlewares=invoiceplane-https@docker" # important to add the middleware to your router
+      - "traefik.http.routers.invoiceplane-http.middlewares=invoiceplane-http@docker" # important to add the middleware to your router
 
   invoiceplane_mysql:
     image: mysql:8.0

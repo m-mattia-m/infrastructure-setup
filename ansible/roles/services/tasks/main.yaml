@@ -75,7 +75,7 @@
   vars:
     target_directory: /home/{{ ansible_user }}/infrastructure/services
     placeholder: "${remote.host.ip}"
-    replacement: "159.100.251.23, 100.0.0.0/24"
+    replacement: "{{ ansible_host  }}"
 
 
 - name: Kill processes running on port 80

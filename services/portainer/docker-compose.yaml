@@ -33,9 +33,12 @@ services:
       # - "traefik.http.routers.portainer-https.middlewares=traefik-auth"
       - "traefik.http.routers.portainer-https.tls=true"
       - "traefik.http.routers.portainer-https.tls.certresolver=infomaniak"
+      - "traefik.http.services.portainer.loadbalancer.server.port=9000"
       - "docker-volume-backup.stop-during-backup=true"
       - "traefik.http.middlewares.portainer-https.ipwhitelist.sourcerange=${remote.host.ip}"
       - "traefik.http.middlewares.portainer-http.ipwhitelist.sourcerange=${remote.host.ip}"
+      - "traefik.http.routers.portainer-https.middlewares=portainer-https@docker" # important to add the middleware to your router
+      - "traefik.http.routers.portainer-http.middlewares=portainer-http@docker" # important to add the middleware to your router
 
 
 volumes:
