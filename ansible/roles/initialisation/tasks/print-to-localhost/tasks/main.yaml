@@ -1,7 +1,10 @@
 ---
+
 - name: Read and filter lines from log file
   become: true
-  ansible.builtin.command: "sed -n '/\\+++++++++++++++++++++++++++++++++++++++++++++++/,$p' ~/home/{{ ansible_user }}/open-vpn-access-server-log.txt | sed -n '1,11p'"
+  ansible.builtin.command: |
+    sed -n '/+++++++++++++++++++++++++++++++++++++++++++++++/,/+++++++++++++++++++++++++++++++++++++++++++++++/p' open-vpn-access-server-log.txt
+  # ansible.builtin.command: "sed -n '/\(+\)\{20\}/,/\(+\)\{20\}/p' open-vpn-access-server-log.txt"
   register: filtered_lines
 
 - name: Debug output
