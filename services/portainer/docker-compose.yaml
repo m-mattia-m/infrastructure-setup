@@ -10,7 +10,7 @@ services:
       VIRTUAL_PORT: 9000 # 9000
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - portainer-data:/data
+      - portainer_data:/data
     ports:
       # WEB
       - "9443:9443" # "9443:9443"
@@ -33,10 +33,13 @@ services:
       # - "traefik.http.routers.portainer-https.middlewares=traefik-auth"
       - "traefik.http.routers.portainer-https.tls=true"
       - "traefik.http.routers.portainer-https.tls.certresolver=infomaniak"
+      - "docker-volume-backup.stop-during-backup=true"
+      - "traefik.http.middlewares.portainer-https.ipwhitelist.sourcerange=${remote.host.ip}"
+      - "traefik.http.middlewares.portainer-http.ipwhitelist.sourcerange=${remote.host.ip}"
 
 
 volumes:
-  portainer-data: {}
+  portainer_data: {}
 
 networks:
   proxy:

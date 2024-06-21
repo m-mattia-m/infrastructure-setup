@@ -36,6 +36,8 @@ services:
       - "traefik.http.routers.shlink-backend-https.rule=Host(`{shlink.fqdn}`)"
       - "traefik.http.routers.shlink-backend-https.tls=true"
       - "traefik.http.routers.shlink-backend-https.tls.certresolver=infomaniak"
+      - "traefik.http.middlewares.shlink-backend-https.ipwhitelist.sourcerange=${remote.host.ip}"
+      - "traefik.http.middlewares.shlink-backend-http.ipwhitelist.sourcerange=${remote.host.ip}"
 
   shlink-web-client:
     hostname: shlink-web-client
@@ -64,7 +66,8 @@ services:
       - "traefik.http.routers.shlink-ui-https.rule=Host(`{shlink.fqdn.ui}`)"
       - "traefik.http.routers.shlink-ui-https.tls=true"
       - "traefik.http.routers.shlink-ui-https.tls.certresolver=infomaniak"
-
+      - "traefik.http.middlewares.shlink-ui-https.ipwhitelist.sourcerange=${remote.host.ip}"
+      - "traefik.http.middlewares.shlink-ui-http.ipwhitelist.sourcerange=${remote.host.ip}"
 
   shlink-mysql:
     image: mysql:8.0
@@ -83,6 +86,7 @@ services:
       - shlink_db:/var/lib/mysql
     labels:
       - "traefik.enable=false"
+      - "docker-volume-backup.stop-during-backup=true"
 
 volumes:
   shlink_db:

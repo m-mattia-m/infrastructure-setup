@@ -18,6 +18,8 @@ services:
       - "traefik.http.routers.whoami-https.rule=Host(`whoami.{ansible.fqdn}`)"
       - "traefik.http.routers.whoami-https.tls=true"
       - "traefik.http.routers.whoami-https.tls.certresolver=infomaniak"
+      - "traefik.http.middlewares.whoami-https.ipwhitelist.sourcerange=${remote.host.ip}"
+      - "traefik.http.middlewares.whoami-http.ipwhitelist.sourcerange=${remote.host.ip}"
 
 networks:
   proxy:

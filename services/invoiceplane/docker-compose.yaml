@@ -32,6 +32,8 @@ services:
       # - "traefik.http.routers.invoiceplane-https.middlewares=traefik-auth"
       - "traefik.http.routers.invoiceplane-https.tls=true"
       - "traefik.http.routers.invoiceplane-https.tls.certresolver=infomaniak"
+      - "traefik.http.middlewares.invoiceplane-http.ipwhitelist.sourcerange=${remote.host.ip}"
+      - "traefik.http.middlewares.invoiceplane-https.ipwhitelist.sourcerange=${remote.host.ip}"
 
   invoiceplane_mysql:
     image: mysql:8.0
@@ -51,6 +53,7 @@ services:
       - invoiceplane_db:/var/lib/mysql
     labels:
       - "traefik.enable=false"
+      - "docker-volume-backup.stop-during-backup=true"
 
 volumes:
   invoiceplane_db:

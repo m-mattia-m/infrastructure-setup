@@ -4,9 +4,10 @@
 - name: Ensure the VM is reachable
   ansible.builtin.ping:
 
-- name: Update apt cache
+- name: Update and upgrade apt cache
   ansible.builtin.apt:
     update_cache: true
+    upgrade: true
   become: true
 
 - name: Install gnome-terminal and curl via apt
@@ -39,3 +40,12 @@
     name: golang-go
     state: present
   become: true
+
+- name: Copy and execute open-vpn-server installation script
+  vars:
+    script_path: "{{ role_path }}/scripts/open-vpn-server-installation.sh"
+    target_directory: "/home/{{ ansible_user }}/open-vpn-access-server-log.txt"
+  ansible.builtin.include_tasks: ./run-script-print-logs/tasks/main.yaml
+
+- name: Extract and print specific section from remote file
+  ansible.builtin.include_tasks: ./print-to-localhost/tasks/main.yaml

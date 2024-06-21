@@ -70,6 +70,14 @@
     replacement: "https://acme-staging-v02.api.letsencrypt.org/directory" # For testing
     # replacement: "https://acme-v02.api.letsencrypt.org/directory" # For production
 
+- name: Call 'remote-host-ip for whitlist' replacement tasks
+  ansible.builtin.include_tasks: ./replace/tasks/main.yaml
+  vars:
+    target_directory: /home/{{ ansible_user }}/infrastructure/services
+    placeholder: "${remote.host.ip}"
+    replacement: "159.100.251.23"
+
+
 - name: Kill processes running on port 80
   ansible.builtin.include_tasks: ./kill-process/tasks/main.yaml
 

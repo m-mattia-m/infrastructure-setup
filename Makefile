@@ -38,6 +38,13 @@ generate-environment:
 	@echo "\
 		PORTAINER_BASE_URL=\"$(PORTAINER_BASE_URL)\"\n\
 	" | sed 's/^[[:space:]]*//g' > ./services/portainer/.env
+	@echo "------------ Set backup environment --------------"
+	@echo "\
+		BACKUP_S3_HOST=\"$(BACKUP_S3_HOST)\"\n\
+		BACKUP_S3_BUCKET_NAME=\"$(BACKUP_S3_BUCKET_NAME)\"\n\
+		BACKUP_S3_KEY_ID=\"$(BACKUP_S3_KEY_ID)\"\n\
+		BACKUP_S3_ACCESS_KEY=\"$(BACKUP_S3_ACCESS_KEY)\"\n\
+	" | sed 's/^[[:space:]]*//g' > ./services/backup/.env
 
 
 install-ansible:

@@ -37,6 +37,8 @@ services:
       - "traefik.http.routers.traefik-https.tls.domains[0].main={ansible.fqdn}"
       - "traefik.http.routers.traefik-https.tls.domains[0].sans=*.{ansible.fqdn}"
       - "traefik.http.routers.traefik-https.service=api@internal"
+      - "traefik.http.middlewares.traefik-https.ipwhitelist.sourcerange=${remote.host.ip}"
+      - "traefik.http.middlewares.traefik-http.ipwhitelist.sourcerange=${remote.host.ip}"
 
 networks:
   proxy:
