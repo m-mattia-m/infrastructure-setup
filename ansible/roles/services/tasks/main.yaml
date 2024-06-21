@@ -120,3 +120,8 @@
   become: true
   community.docker.docker_compose_v2:
     project_src: /home/{{ ansible_user }}/infrastructure/services/invoiceplane
+
+- name: Start Backup
+  become: true
+  community.docker.docker_compose_v2:
+    project_src: /home/{{ ansible_user }}/infrastructure/services/backup

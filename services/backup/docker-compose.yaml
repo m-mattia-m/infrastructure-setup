@@ -1,6 +1,6 @@
 services:
   backup:
-    image: docker-volume-backup-mm:1 # jareware/docker-volume-backup
+    image: jareware/docker-volume-backup
     environment:
       AWS_EXTRA_ARGS: "--endpoint-url ${BACKUP_S3_HOST}"
       AWS_S3_BUCKET_NAME: "${BACKUP_S3_BUCKET_NAME}"
