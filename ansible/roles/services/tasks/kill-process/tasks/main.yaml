@@ -13,6 +13,7 @@
   become: true
   ansible.builtin.command: "kill {{ item }}"
   with_items: "{{ port_check.stdout_lines }}"
+  ignore_errors: true
   when: port_check.stdout_lines is defined and port_check.stdout_lines | length > 0
 
 - name: Debug no process found on port 80

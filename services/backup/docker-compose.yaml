@@ -13,6 +13,8 @@ services:
       - portainer_data:/backup/portainer_data:ro
     labels:
       - "traefik.enable=false"
+    networks:
+      - proxy
 
 volumes:
   shlink_db:
@@ -22,4 +24,8 @@ volumes:
   openvpn:
     external: true
   portainer_data:
+    external: true
+
+networks:
+  proxy:
     external: true
