@@ -91,6 +91,9 @@
     hour: "2"
     job: "sh /home/{{ ansible_user }}/infrastructure/services/dyndns-check/check-dyndns.sh"
 
+- name: Run "Check-DynDNS" Script
+  ansible.builtin.shell: "sh /home/{{ ansible_user }}/infrastructure/services/dyndns-check/check-dyndns.sh"
+
 - name: Kill processes running on port 80
   ansible.builtin.include_tasks: ./kill-process/tasks/main.yaml
 

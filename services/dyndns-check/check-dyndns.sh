@@ -38,6 +38,14 @@ else
                 sed -i "s/$LAST_IP/$CURRENT_IP/g" "$FILE"
             fi
             echo "$(date '+%Y-%m-%d %H:%M:%S') - File $FILE has been updated." >> $LOG_FILE
+
+            # Get the directory of the Docker Compose file
+            DIR=$(dirname "$FILE")
+            
+            # Restart Docker Compose services in the directory
+            echo "$(date '+%Y-%m-%d %H:%M:%S') - Restarting Docker Compose services in $DIR"
+            (cd "$DIR" && sudo docker compose down && sudo docker compose up -d)
+
         else
             echo "$(date '+%Y-%m-%d %H:%M:%S') - File $FILE does not exist. Skipping." >> $LOG_FILE
         fi
