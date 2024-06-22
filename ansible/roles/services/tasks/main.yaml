@@ -70,13 +70,26 @@
     replacement: "https://acme-staging-v02.api.letsencrypt.org/directory" # For testing
     # replacement: "https://acme-v02.api.letsencrypt.org/directory" # For production
 
-- name: Call 'remote-host-ip for whitlist' replacement tasks
+- name: Call 'AllowList - DynDNS' replacement tasks
   ansible.builtin.include_tasks: ./replace/tasks/main.yaml
   vars:
-    target_directory: /home/{{ ansible_user }}/infrastructure/services
-    placeholder: "${remote.host.ip}"
-    replacement: "{{ ansible_host  }}"
+    target_directory: "/home/{{ ansible_user }}/infrastructure/services"
+    placeholder: "replace:home.dyn.dns"
+    replacement: "home.muegglers.com"
 
+- name: Call 'AllowList - files to update' replacement tasks
+  ansible.builtin.include_tasks: ./replace/tasks/main.yaml
+  vars:
+    target_directory: "/home/{{ ansible_user }}/infrastructure/services"
+    placeholder: "replace.files.to.update"
+    replacement: "/home/{{ ansible_user }}/infrastructure/services/whoami/docker-compose.yaml /home/{{ ansible_user }}/infrastructure/services/shlink/docker-compose.yaml /home/{{ ansible_user }}/infrastructure/services/portainer/docker-compose.yaml /home/{{ ansible_user }}/infrastructure/services/invoiceplane/docker-compose.yaml /home/{{ ansible_user }}/infrastructure/services/traefik/docker-compose.yaml"
+
+- name: Create cron-job for dynDNS-check every day at 2am
+  ansible.builtin.cron:
+    name: "refresh dynDNS"
+    minute: "0"
+    hour: "2"
+    job: "sh /home/{{ ansible_user }}/infrastructure/services/dyndns-check/check-dyndns.sh"
 
 - name: Kill processes running on port 80
   ansible.builtin.include_tasks: ./kill-process/tasks/main.yaml
