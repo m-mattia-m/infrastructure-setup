@@ -21,6 +21,7 @@ services:
       DB_PASSWORD: '${SHLINK_DB_PASSWORD}'
       MEMORY_LIMIT: '256M'
       INITIAL_API_KEY: '${SHLINK_INITIAL_API_KEY}' # an API key that will be created once during container start-up
+      SHELL_VERBOSITY: 3
     networks:
       - proxy
     depends_on:
