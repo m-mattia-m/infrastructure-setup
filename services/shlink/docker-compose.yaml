@@ -1,30 +1,26 @@
 services:
-
   shlink:
-    hostname: shlink
     image: shlinkio/shlink:stable
     restart: unless-stopped
+    depends_on:
+      - shlink_database
+    links:
+      - shlink_database
     ports:
-      - "8991:8080"
-    environment:
-      TIMEZONE: "Europe/Zurich"
-      DEFAULT_DOMAIN: '${SHLINK_FQDN}'
-      IS_HTTPS_ENABLED: true
-      GEOLITE_LICENSE_KEY: '${SHLINK_GEOLITE_LICENSE_KEY}'
-      DB_DRIVER: 'mysql'
-      # DB_UNIX_SOCKET: 'mysql'
-      DB_NAME: '${SHLINK_DB_NAME}'
-      DB_HOST: 'shlink_mysql'
-      DB_PORT: '3308'
-      DB_USER: '${SHLINK_DB_USER}'
-      DB_PASSWORD: '${SHLINK_DB_PASSWORD}'
-      MEMORY_LIMIT: '256M'
-      INITIAL_API_KEY: '${SHLINK_INITIAL_API_KEY}' # an API key that will be created once during container start-up
-      SHELL_VERBOSITY: 3
+      - 8991:8080
     networks:
       - proxy
-    depends_on:
-        - shlink_mysql
+    environment:
+      - TZ="Europe/Berlin"
+      - DEFAULT_DOMAIN=localhost:8080
+      - IS_HTTPS_ENABLED=false
+      - DB_DRIVER=maria
+      - DB_USER=shlink
+      - DB_NAME=shlink
+      - DB_PASSWORD=shlinkpassword
+      - DB_HOST=shlink_database
+      - SHELL_VERBOSITY=3
+      - INITIAL_API_KEY=asdf
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.shlink-backend-http.entrypoints=web" # 'web' could be 'http' if also in config file used
@@ -40,19 +36,21 @@ services:
   shlink-web-client:
     hostname: shlink-web-client
     image: shlinkio/shlink-web-client:stable
+    restart: unless-stopped
+    depends_on:
+      - shlink
+    links:
+      - shlink
+    ports:
+      - 8990:8080
+    networks:
+      - proxy
     environment:
         TZ: "Europe/Zurich"
         PUID: 1000
         PGID: 1000
-        SHLINK_SERVER_URL: "${SHLINK_SERVER_URL}"
-        SHLINK_SERVER_API_KEY: "${SHLINK_INITIAL_API_KEY}"
-    depends_on:
-        - shlink
-    ports:
-        - 8990:8080
-    networks:
-        - proxy
-    restart: unless-stopped
+        SHLINK_SERVER_URL: http://localhost:8991
+        SHLINK_SERVER_API_KEY: asdf
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.shlink-ui-http.entrypoints=web" # 'web' could be 'http' if also in config file used
@@ -70,26 +68,18 @@ services:
       # - "traefik.http.routers.shlink-ui-http.middlewares=shlink-ui-http@docker" # important to add the middleware to your router
       # no allow-list on account of accessing from IP-adresses which are not from home
 
-  shlink_mysql:
-    image: mysql:8.0
-    container_name: shlink_mysql
-    hostname: shlink_mysql
+  shlink_database:
+    image: mariadb:10.8
     restart: unless-stopped
+    environment:
+      - MARIADB_ROOT_PASSWORD=rootshlinkpassword
+      - MARIADB_DATABASE=shlink
+      - MARIADB_USER=shlink
+      - MARIADB_PASSWORD=shlinkpassword
     networks:
       - proxy
-    ports:
-     - '3308:3306'
-    environment:
-      MYSQL_DATABASE: "${SHLINK_DB_NAME}"
-      MYSQL_RANDOM_ROOT_PASSWORD: 'true'
-      MYSQL_USER: "${SHLINK_DB_USER}"
-      MYSQL_PASSWORD: "${SHLINK_DB_PASSWORD}"
     volumes:
       - shlink_db:/var/lib/mysql
-    labels:
-      - "traefik.enable=false"
-      - "docker-volume-backup.stop-during-backup=true"
-
 
 volumes:
   shlink_db:

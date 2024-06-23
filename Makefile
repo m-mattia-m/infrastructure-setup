@@ -19,12 +19,13 @@ generate-environment:
 	" | sed 's/^[[:space:]]*//g' > ./services/traefik/.env
 	@echo "------------- Set shlink environment -------------"
 	@echo "\
-		SHLINK_FQDN=\"$(SHLINK_FQDN)\"\n\
+		SHLINK_UI_FQDN=\"$(SHLINK_UI_FQDN)\"\n\
 		SHLINK_DB_NAME=\"$(SHLINK_DB_NAME)\"\n\
 		SHLINK_DB_USER=\"$(SHLINK_DB_USER)\"\n\
 		SHLINK_DB_PASSWORD=\"$(SHLINK_DB_PASSWORD)\"\n\
 		SHLINK_GEOLITE_LICENSE_KEY=\"$(SHLINK_GEOLITE_LICENSE_KEY)\"\n\
 		SHLINK_INITIAL_API_KEY=\"$(SHLINK_INITIAL_API_KEY)\"\n\
+		SHLINK_SERVER_FQDN=\"$(SHLINK_SERVER_FQDN)\"\n\
 		SHLINK_SERVER_URL=\"$(SHLINK_SERVER_URL)\"\n\
 	" | sed 's/^[[:space:]]*//g' > ./services/shlink/.env
 	@echo "--------- Set invoiceplane environment -----------"
