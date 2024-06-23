@@ -4,6 +4,8 @@ services:
     hostname: invoiceplane
     image: mhzawadi/invoiceplane:1.6.0
     restart: unless-stopped
+    ports:
+        - 8992:80
     environment:
         TZ: "Europe/Zurich"
         MYSQL_HOST: "invoiceplane_mysql"
@@ -13,12 +15,10 @@ services:
         MYSQL_PORT: 3307
         IP_URL: "${INVOICEPLANE_HOST}"
         DISABLE_SETUP: false
-    depends_on:
-        - invoiceplane_mysql
-    ports:
-        - 8992:80
     networks:
-        - proxy
+      - proxy
+    depends_on:
+      - invoiceplane_mysql
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.invoiceplane-http.entrypoints=web" # 'web' could be 'http' if also in config file used
@@ -28,7 +28,7 @@ services:
       - "traefik.http.middlewares.sslheader.headers.customrequestheaders.X-Forwarded-Proto=https"
       - "traefik.http.routers.invoiceplane-https.middlewares=invoiceplane-https-redirect"
       - "traefik.http.routers.invoiceplane-https.entrypoints=websecure" # 'websecure' could be 'https' if also in config file used
-      - "traefik.http.routers.invoiceplane-https.rule=Host( )"
+      - "traefik.http.routers.invoiceplane-https.rule=Host({invoiceplane.fqdn})"
       # - "traefik.http.routers.invoiceplane-https.middlewares=traefik-auth"
       - "traefik.http.routers.invoiceplane-https.tls=true"
       - "traefik.http.routers.invoiceplane-https.tls.certresolver=infomaniak"
