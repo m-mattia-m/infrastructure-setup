@@ -28,7 +28,7 @@ services:
       - "traefik.http.middlewares.sslheader.headers.customrequestheaders.X-Forwarded-Proto=https"
       - "traefik.http.routers.invoiceplane-https.middlewares=invoiceplane-https-redirect"
       - "traefik.http.routers.invoiceplane-https.entrypoints=websecure" # 'websecure' could be 'https' if also in config file used
-      - "traefik.http.routers.invoiceplane-https.rule=Host({invoiceplane.fqdn})"
+      - "traefik.http.routers.invoiceplane-https.rule=Host(`{invoiceplane.fqdn}`)"
       # - "traefik.http.routers.invoiceplane-https.middlewares=traefik-auth"
       - "traefik.http.routers.invoiceplane-https.tls=true"
       - "traefik.http.routers.invoiceplane-https.tls.certresolver=infomaniak"
