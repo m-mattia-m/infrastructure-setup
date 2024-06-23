@@ -11,7 +11,7 @@ services:
       PUID: 1000
       PGID: 1000
       DEFAULT_DOMAIN: '${SHLINK_FQDN}'
-      IS_HTTPS_ENABLED: 'false'
+      IS_HTTPS_ENABLED: 'true'
       GEOLITE_LICENSE_KEY: '${SHLINK_GEOLITE_LICENSE_KEY}'
       DB_DRIVER: 'mysql'
       DB_NAME: '${SHLINK_DB_NAME}'
