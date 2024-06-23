@@ -8,12 +8,14 @@ services:
       - "8991:8080"
     environment:
       TZ: "Europe/Zurich"
+      TIMEZONE: "Europe/Zurich"
       PUID: 1000
       PGID: 1000
       DEFAULT_DOMAIN: '${SHLINK_FQDN}'
       IS_HTTPS_ENABLED: 'true'
       GEOLITE_LICENSE_KEY: '${SHLINK_GEOLITE_LICENSE_KEY}'
       DB_DRIVER: 'mysql'
+      DB_UNIX_SOCKET: 'mysql'
       DB_NAME: '${SHLINK_DB_NAME}'
       DB_HOST: 'shlink_mysql'
       DB_PORT: '3306'

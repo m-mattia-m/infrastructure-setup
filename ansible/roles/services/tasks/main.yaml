@@ -137,12 +137,12 @@
   community.docker.docker_compose_v2:
     project_src: /home/{{ ansible_user }}/infrastructure/services/invoiceplane
 
-- name: Pause before start backup to ensure that every database started up successfully
-  ansible.builtin.pause:
-    minutes: 1
-    seconds: 30
+# - name: Pause before start backup to ensure that every database started up successfully
+#   ansible.builtin.pause:
+#     seconds: 180
+#     # minutes: 1
 
-- name: Start Backup
-  become: true
-  community.docker.docker_compose_v2:
-    project_src: /home/{{ ansible_user }}/infrastructure/services/backup
+# - name: Start Backup
+#   become: true
+#   community.docker.docker_compose_v2:
+#     project_src: /home/{{ ansible_user }}/infrastructure/services/backup
