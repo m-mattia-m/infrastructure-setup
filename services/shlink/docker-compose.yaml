@@ -1,3 +1,5 @@
+# YOU MUST LINK THE `.env`-FILE FOR THIS DOCKER COMPOSE SETUP: `docker compose --env-file .env up -d`
+
 services:
   shlink:
     image: shlinkio/shlink:stable
@@ -11,16 +13,16 @@ services:
     networks:
       - proxy
     environment:
-      - TZ="Europe/Berlin"
-      - DEFAULT_DOMAIN=localhost:8080
+      - TZ="Europe/Zurich"
+      - DEFAULT_DOMAIN=${SHLINK_UI_FQDN}
       - IS_HTTPS_ENABLED=false
       - DB_DRIVER=maria
-      - DB_USER=shlink
-      - DB_NAME=shlink
-      - DB_PASSWORD=shlinkpassword
+      - DB_USER=${SHLINK_DB_USER}
+      - DB_NAME=${SHLINK_DB_NAME}
+      - DB_PASSWORD=${SHLINK_DB_PASSWORD}
       - DB_HOST=shlink_database
       - SHELL_VERBOSITY=3
-      - INITIAL_API_KEY=asdf
+      - INITIAL_API_KEY=${SHLINK_INITIAL_API_KEY}
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.shlink-backend-http.entrypoints=web" # 'web' could be 'http' if also in config file used
@@ -72,10 +74,10 @@ services:
     image: mariadb:10.8
     restart: unless-stopped
     environment:
-      - MARIADB_ROOT_PASSWORD=rootshlinkpassword
-      - MARIADB_DATABASE=shlink
-      - MARIADB_USER=shlink
-      - MARIADB_PASSWORD=shlinkpassword
+      - MYSQL_RANDOM_ROOT_PASSWORD=true
+      - MARIADB_DATABASE=${SHLINK_DB_NAME}
+      - MARIADB_USER=${SHLINK_DB_USER}
+      - MARIADB_PASSWORD=${SHLINK_DB_PASSWORD}
     networks:
       - proxy
     volumes:

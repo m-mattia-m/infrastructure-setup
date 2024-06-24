@@ -131,6 +131,7 @@
   become: true
   community.docker.docker_compose_v2:
     project_src: /home/{{ ansible_user }}/infrastructure/services/shlink
+    env_file: /home/{{ ansible_user }}/infrastructure/services/shlink/.env
 
 - name: Start invoiceplane
   become: true
