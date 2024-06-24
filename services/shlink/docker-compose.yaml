@@ -1,4 +1,5 @@
-# YOU MUST LINK THE `.env`-FILE FOR THIS DOCKER COMPOSE SETUP: `docker compose --env-file .env up -d`
+# YOU MUST LINK THE `.env`-FILE FOR THIS DOCKER COMPOSE SETUP: 
+# `docker compose --env-file .env up -d`
 
 services:
   shlink:
@@ -51,8 +52,8 @@ services:
         TZ: "Europe/Zurich"
         PUID: 1000
         PGID: 1000
-        SHLINK_SERVER_URL: http://localhost:8991
-        SHLINK_SERVER_API_KEY: asdf
+        SHLINK_SERVER_URL: ${SHLINK_SERVER_URL}
+        SHLINK_SERVER_API_KEY: ${SHLINK_INITIAL_API_KEY}
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.shlink-ui-http.entrypoints=web" # 'web' could be 'http' if also in config file used
