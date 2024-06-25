@@ -127,23 +127,29 @@
   community.docker.docker_compose_v2:
     project_src: /home/{{ ansible_user }}/infrastructure/services/portainer
 
+- name: Start invoiceplane
+  become: true
+  community.docker.docker_compose_v2:
+    project_src: /home/{{ ansible_user }}/infrastructure/services/invoiceplane
+
+# you must start the docker compose file with `--env-file .env`
 - name: Start shlink
   become: true
   community.docker.docker_compose_v2:
     project_src: /home/{{ ansible_user }}/infrastructure/services/shlink
     env_files: /home/{{ ansible_user }}/infrastructure/services/shlink/.env
 
-- name: Start invoiceplane
-  become: true
-  community.docker.docker_compose_v2:
-    project_src: /home/{{ ansible_user }}/infrastructure/services/invoiceplane
+# - name: Start shlink
+#   become: true
+#   ansible.builtin.command: |
+#     docker compose -f /home/{{ ansible_user }}/infrastructure/services/shlink/docker-compose.yaml --env-file /home/{{ ansible_user }}/infrastructure/services/shlink/.env up -d
 
 # - name: Pause before start backup to ensure that every database started up successfully
 #   ansible.builtin.pause:
 #     seconds: 180
 #     # minutes: 1
 
-# - name: Start Backup
-#   become: true
-#   community.docker.docker_compose_v2:
-#     project_src: /home/{{ ansible_user }}/infrastructure/services/backup
+- name: Start Backup
+  become: true
+  community.docker.docker_compose_v2:
+    project_src: /home/{{ ansible_user }}/infrastructure/services/backup
