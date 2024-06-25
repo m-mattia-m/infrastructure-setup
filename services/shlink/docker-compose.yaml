@@ -1,5 +1,6 @@
 # YOU MUST LINK THE `.env`-FILE FOR THIS DOCKER COMPOSE SETUP: 
 # `docker compose --env-file .env up -d`
+# On account of this reason I decided to replace the environment-variables here during the ansible-instatallation
 
 services:
   shlink:
@@ -14,16 +15,18 @@ services:
     networks:
       - proxy
     environment:
-      - TZ="Europe/Zurich"
-      - DEFAULT_DOMAIN=$${SHLINK_UI_FQDN}
-      - IS_HTTPS_ENABLED=false
+      - TZ=Europe/Zurich
+      - IS_HTTPS_ENABLED=true
+      - DEFAULT_DOMAIN=${SHLINK_SERVER_FQDN}
       - DB_DRIVER=maria
-      - DB_USER=$${SHLINK_DB_USER}
-      - DB_NAME=$${SHLINK_DB_NAME}
-      - DB_PASSWORD=$${SHLINK_DB_PASSWORD}
+      - DB_USER=${SHLINK_DB_USER}
+      - DB_NAME=${SHLINK_DB_NAME}
+      - DB_PASSWORD=${SHLINK_DB_PASSWORD}
       - DB_HOST=shlink_database
+      - DB_PORT=3308
       - SHELL_VERBOSITY=3
-      - INITIAL_API_KEY=$${SHLINK_INITIAL_API_KEY}
+      - INITIAL_API_KEY=${SHLINK_INITIAL_API_KEY}
+      - GEOLITE_LICENSE_KEY=${SHLINK_GEOLITE_LICENSE_KEY}
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.shlink-backend-http.entrypoints=web" # 'web' could be 'http' if also in config file used
@@ -52,8 +55,8 @@ services:
         TZ: "Europe/Zurich"
         PUID: 1000
         PGID: 1000
-        SHLINK_SERVER_URL: $${SHLINK_SERVER_URL}
-        SHLINK_SERVER_API_KEY: $${SHLINK_INITIAL_API_KEY}
+        SHLINK_SERVER_URL: ${SHLINK_SERVER_URL}
+        SHLINK_SERVER_API_KEY: ${SHLINK_INITIAL_API_KEY}
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.shlink-ui-http.entrypoints=web" # 'web' could be 'http' if also in config file used
@@ -65,20 +68,22 @@ services:
       - "traefik.http.routers.shlink-ui-https.rule=Host(`{shlink.fqdn.ui}`)"
       - "traefik.http.routers.shlink-ui-https.tls=true"
       - "traefik.http.routers.shlink-ui-https.tls.certresolver=infomaniak"
-      # - "traefik.http.middlewares.shlink-ui-https.ipwhitelist.sourcerange=${remote.host.ip.or.dyndns}"
-      # - "traefik.http.middlewares.shlink-ui-http.ipwhitelist.sourcerange=${sremote.host.ip.or.dyndns}"
-      # - "traefik.http.routers.shlink-ui-https.middlewares=shlink-ui-https@docker" # important to add the middleware to your router
-      # - "traefik.http.routers.shlink-ui-http.middlewares=shlink-ui-http@docker" # important to add the middleware to your router
+      - "traefik.http.middlewares.shlink-ui-https.ipwhitelist.sourcerange=${remote.host.ip.or.dyndns}"
+      - "traefik.http.middlewares.shlink-ui-http.ipwhitelist.sourcerange=${remote.host.ip.or.dyndns}"
+      - "traefik.http.routers.shlink-ui-https.middlewares=shlink-ui-https@docker" # important to add the middleware to your router
+      - "traefik.http.routers.shlink-ui-http.middlewares=shlink-ui-http@docker" # important to add the middleware to your router
       # no allow-list on account of accessing from IP-adresses which are not from home
 
   shlink_database:
     image: mariadb:10.8
     restart: unless-stopped
+    ports:
+      - "3308:3306"
     environment:
       - MYSQL_RANDOM_ROOT_PASSWORD=true
-      - MARIADB_DATABASE=$${SHLINK_DB_NAME}
-      - MARIADB_USER=$${SHLINK_DB_USER}
-      - MARIADB_PASSWORD=$${SHLINK_DB_PASSWORD}
+      - MARIADB_DATABASE=${SHLINK_DB_NAME}
+      - MARIADB_USER=${SHLINK_DB_USER}
+      - MARIADB_PASSWORD=${SHLINK_DB_PASSWORD}
     networks:
       - proxy
     volumes:

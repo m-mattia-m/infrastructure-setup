@@ -39,21 +39,21 @@
   vars:
     target_directory: /home/{{ ansible_user }}/infrastructure/services
     placeholder: "{shlink.fqdn}"
-    replacement: "l.mattiamueggler.ch"
+    replacement: "{{ shlink_server_fqdn }}"
 
 - name: Call 'shlink-fqdn-ui' replacement tasks
   ansible.builtin.include_tasks: ./replace/tasks/main.yaml
   vars:
     target_directory: /home/{{ ansible_user }}/infrastructure/services
     placeholder: "{shlink.fqdn.ui}"
-    replacement: "shlink.services.mattiamueggler.ch"
+    replacement: "{{ shlink_ui_fqdn }}"
 
 - name: Call 'invoiceplane-fqdn' replacement tasks
   ansible.builtin.include_tasks: ./replace/tasks/main.yaml
   vars:
     target_directory: /home/{{ ansible_user }}/infrastructure/services
     placeholder: "{invoiceplane.fqdn}"
-    replacement: "invoiceplane.services.mattiamueggler.ch"
+    replacement: "{{ invoiceplane_fqdn }}"
 
 - name: Call 'portainer-fqdn' replacement tasks
   ansible.builtin.include_tasks: ./replace/tasks/main.yaml
@@ -67,22 +67,74 @@
   vars:
     target_directory: /home/{{ ansible_user }}/infrastructure/services
     placeholder: "${caServer}"
-    replacement: "https://acme-staging-v02.api.letsencrypt.org/directory" # For testing
-    # replacement: "https://acme-v02.api.letsencrypt.org/directory" # For production
+    replacement: "{{ ca_server }}" # For testing
 
 - name: Call 'AllowList - DynDNS' replacement tasks
   ansible.builtin.include_tasks: ./replace/tasks/main.yaml
   vars:
     target_directory: "/home/{{ ansible_user }}/infrastructure/services"
     placeholder: "replace:home.dyn.dns"
-    replacement: "home.muegglers.com"
+    replacement: "{{ allowed_dyn_dns }}"
 
 - name: Call 'AllowList - files to update' replacement tasks
   ansible.builtin.include_tasks: ./replace/tasks/main.yaml
   vars:
     target_directory: "/home/{{ ansible_user }}/infrastructure/services"
     placeholder: "replace.files.to.update"
-    replacement: "/home/{{ ansible_user }}/infrastructure/services/whoami/docker-compose.yaml /home/{{ ansible_user }}/infrastructure/services/shlink/docker-compose.yaml /home/{{ ansible_user }}/infrastructure/services/portainer/docker-compose.yaml /home/{{ ansible_user }}/infrastructure/services/invoiceplane/docker-compose.yaml /home/{{ ansible_user }}/infrastructure/services/traefik/docker-compose.yaml"
+    replacement: "{{ allow_list_files_to_update }}"
+
+# replace from here, if you find a solution for starting shlink with an .env file
+
+- name: Call '${SHLINK_DB_NAME}' replacement tasks
+  ansible.builtin.include_tasks: ./replace/tasks/main.yaml
+  vars:
+    target_directory: "/home/{{ ansible_user }}/infrastructure/services"
+    placeholder: "${SHLINK_DB_NAME}"
+    replacement: "{{ shlink_db_name }}"
+
+- name: Call '${SHLINK_DB_USER}' replacement tasks
+  ansible.builtin.include_tasks: ./replace/tasks/main.yaml
+  vars:
+    target_directory: "/home/{{ ansible_user }}/infrastructure/services"
+    placeholder: "${SHLINK_DB_USER}"
+    replacement: "{{ shlink_db_user }}"
+
+- name: Call '${SHLINK_DB_PASSWORD}' replacement tasks
+  ansible.builtin.include_tasks: ./replace/tasks/main.yaml
+  vars:
+    target_directory: "/home/{{ ansible_user }}/infrastructure/services"
+    placeholder: "${SHLINK_DB_PASSWORD}"
+    replacement: "{{ shlink_db_password }}"
+
+- name: Call '${SHLINK_GEOLITE_LICENSE_KEY}' replacement tasks
+  ansible.builtin.include_tasks: ./replace/tasks/main.yaml
+  vars:
+    target_directory: "/home/{{ ansible_user }}/infrastructure/services"
+    placeholder: "${SHLINK_GEOLITE_LICENSE_KEY}"
+    replacement: "{{ shlink_init_api_key }}"
+
+- name: Call '${SHLINK_INITIAL_API_KEY}' replacement tasks
+  ansible.builtin.include_tasks: ./replace/tasks/main.yaml
+  vars:
+    target_directory: "/home/{{ ansible_user }}/infrastructure/services"
+    placeholder: "${SHLINK_INITIAL_API_KEY}"
+    replacement: "{{ shlink_geoligt_license_key }}"
+
+- name: Call '${SHLINK_SERVER_FQDN}' replacement tasks
+  ansible.builtin.include_tasks: ./replace/tasks/main.yaml
+  vars:
+    target_directory: "/home/{{ ansible_user }}/infrastructure/services"
+    placeholder: "${SHLINK_SERVER_FQDN}"
+    replacement: "{{ shlink_server_fqdn }}"
+
+- name: Call '${SHLINK_UI_FQDN}' replacement tasks
+  ansible.builtin.include_tasks: ./replace/tasks/main.yaml
+  vars:
+    target_directory: "/home/{{ ansible_user }}/infrastructure/services"
+    placeholder: "${SHLINK_SERVER_URL}"
+    replacement: "{{ shlink_server_url }}"
+
+# replace until here, if you find a solution for starting shlink with an .env file
 
 - name: Create cron-job for dynDNS-check every day at 2am
   ansible.builtin.cron:
@@ -90,9 +142,6 @@
     minute: "0"
     hour: "2"
     job: "sh /home/{{ ansible_user }}/infrastructure/services/dyndns-check/check-dyndns.sh"
-
-- name: Run "Check-DynDNS" Script
-  ansible.builtin.shell: "sh /home/{{ ansible_user }}/infrastructure/services/dyndns-check/check-dyndns.sh"
 
 - name: Kill processes running on port 80
   ansible.builtin.include_tasks: ./kill-process/tasks/main.yaml
@@ -137,17 +186,7 @@
   become: true
   community.docker.docker_compose_v2:
     project_src: /home/{{ ansible_user }}/infrastructure/services/shlink
-    env_files: /home/{{ ansible_user }}/infrastructure/services/shlink/.env
-
-# - name: Start shlink
-#   become: true
-#   ansible.builtin.command: |
-#     docker compose -f /home/{{ ansible_user }}/infrastructure/services/shlink/docker-compose.yaml --env-file /home/{{ ansible_user }}/infrastructure/services/shlink/.env up -d
-
-# - name: Pause before start backup to ensure that every database started up successfully
-#   ansible.builtin.pause:
-#     seconds: 180
-#     # minutes: 1
+    # env_files: /home/{{ ansible_user }}/infrastructure/services/shlink/.env
 
 - name: Start Backup
   become: true

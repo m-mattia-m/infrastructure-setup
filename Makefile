@@ -19,7 +19,6 @@ generate-environment:
 	" | sed 's/^[[:space:]]*//g' > ./services/traefik/.env
 	@echo "------------- Set shlink environment -------------"
 	@echo "\
-		SHLINK_UI_FQDN=\"$(SHLINK_UI_FQDN)\"\n\
 		SHLINK_DB_NAME=\"$(SHLINK_DB_NAME)\"\n\
 		SHLINK_DB_USER=\"$(SHLINK_DB_USER)\"\n\
 		SHLINK_DB_PASSWORD=\"$(SHLINK_DB_PASSWORD)\"\n\

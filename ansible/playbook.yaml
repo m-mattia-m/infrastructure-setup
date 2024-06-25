@@ -4,3 +4,17 @@
   roles:
     - initialisation
     - services
+  vars:
+    allowed_dyn_dns: "myhome.domain.com"
+    shlink_ui_fqdn: "shlink-ui.services.domain.com"
+    shlink_db_name: "shlink"
+    shlink_db_user: "shlinkuser"
+    shlink_db_password: "MySafeShlinkPassword12345"
+    shlink_init_api_key: "asdf"
+    shlink_geoligt_license_key: "asdf"
+    shlink_server_fqdn: "shlink.domain.com"
+    shlink_server_url: "https://shlink.domain.com"
+    invoiceplane_fqdn: "invoiceplane.services.domain.com"
+    ca_server: "https://acme-staging-v02.api.letsencrypt.org/directory" # For testing
+    # ca_server: "https://acme-v02.api.letsencrypt.org/directory" # For production
+    allow_list_files_to_update: "/home/{{ ansible_user }}/infrastructure/services/whoami/docker-compose.yaml /home/{{ ansible_user }}/infrastructure/services/shlink/docker-compose.yaml /home/{{ ansible_user }}/infrastructure/services/portainer/docker-compose.yaml /home/{{ ansible_user }}/infrastructure/services/invoiceplane/docker-compose.yaml /home/{{ ansible_user }}/infrastructure/services/traefik/docker-compose.yaml"
