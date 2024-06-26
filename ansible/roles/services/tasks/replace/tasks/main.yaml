@@ -10,6 +10,10 @@
   ansible.builtin.replace:
     path: "{{ item.path }}"
     regexp: "{{ placeholder | regex_escape }}"
-    replace: "{{ replacement }}"
+    replace: "{{ item_replacement }}"
   loop: "{{ files_to_modify.files }}"
+  loop_control:
+    loop_var: item
   when: files_to_modify.matched > 0
+  vars:
+    item_replacement: "{{ replacement }}"

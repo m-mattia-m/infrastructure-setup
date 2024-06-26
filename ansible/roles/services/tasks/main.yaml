@@ -17,8 +17,20 @@
 
 - name: Create docker proxy network
   become: true # run command with sudo access
-  ansible.builtin.docker_network:
+  community.docker.docker_network:
     name: proxy
+
+- name: S3 File Downloader
+  ansible.builtin.include_tasks: ./backup-restore/tasks/main.yaml
+  vars:
+    s3_bucket: "{{ s3_bucket_name }}"
+    destination: "/path/to/destination"
+    file_name: ""
+    aws_endpoint_url: "{{ s3_endpoint_url }}"
+    aws_access_id: "{{ s3_access_id }}"
+    aws_secret_key: "{{ s3_access_key }}"
+    # restore_backup: false
+    # restore_backup_name: ""
 
 - name: Call 'fqdn' replacement tasks
   ansible.builtin.include_tasks: ./replace/tasks/main.yaml
@@ -69,7 +81,7 @@
     placeholder: "${caServer}"
     replacement: "{{ ca_server }}" # For testing
 
-- name: Call 'AllowList - DynDNS' replacement tasks
+- name: Call 'AllowList - DynDNS script' replacement tasks
   ansible.builtin.include_tasks: ./replace/tasks/main.yaml
   vars:
     target_directory: "/home/{{ ansible_user }}/infrastructure/services"
@@ -143,6 +155,9 @@
     hour: "2"
     job: "sh /home/{{ ansible_user }}/infrastructure/services/dyndns-check/check-dyndns.sh"
 
+- name: Run "Check-DynDNS" Script
+  ansible.builtin.shell: "sh /home/{{ ansible_user }}/infrastructure/services/dyndns-check/check-dyndns.sh"
+
 - name: Kill processes running on port 80
   ansible.builtin.include_tasks: ./kill-process/tasks/main.yaml
 
@@ -181,12 +196,10 @@
   community.docker.docker_compose_v2:
     project_src: /home/{{ ansible_user }}/infrastructure/services/invoiceplane
 
-# you must start the docker compose file with `--env-file .env`
 - name: Start shlink
   become: true
   community.docker.docker_compose_v2:
     project_src: /home/{{ ansible_user }}/infrastructure/services/shlink
-    # env_files: /home/{{ ansible_user }}/infrastructure/services/shlink/.env
 
 - name: Start Backup
   become: true

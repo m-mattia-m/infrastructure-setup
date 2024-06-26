@@ -5,16 +5,25 @@
     - initialisation
     - services
   vars:
-    allowed_dyn_dns: "myhome.domain.com"
-    shlink_ui_fqdn: "shlink-ui.services.domain.com"
+    allowed_dyn_dns: "home.domain.com"
+    s3_bucket_name: "nodes-backup"
+    s3_endpoint_url: "sos-ch-dk-2.exo.io"
+    s3_access_id: "asdf"
+    s3_access_key: "asdf"
+    shlink_ui_fqdn: "shlink.services.domain.com"
     shlink_db_name: "shlink"
     shlink_db_user: "shlinkuser"
     shlink_db_password: "MySafeShlinkPassword12345"
-    shlink_init_api_key: "asdf"
-    shlink_geoligt_license_key: "asdf"
-    shlink_server_fqdn: "shlink.domain.com"
-    shlink_server_url: "https://shlink.domain.com"
+    shlink_init_api_key: "9ca5faf4-e151-4d2c-8a79-db66768f4b8b"
+    shlink_geoligt_license_key: "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"
+    shlink_server_fqdn: "l.domain.com"
+    shlink_server_url: "https://l.domain.com"
     invoiceplane_fqdn: "invoiceplane.services.domain.com"
     ca_server: "https://acme-staging-v02.api.letsencrypt.org/directory" # For testing
     # ca_server: "https://acme-v02.api.letsencrypt.org/directory" # For production
-    allow_list_files_to_update: "/home/{{ ansible_user }}/infrastructure/services/whoami/docker-compose.yaml /home/{{ ansible_user }}/infrastructure/services/shlink/docker-compose.yaml /home/{{ ansible_user }}/infrastructure/services/portainer/docker-compose.yaml /home/{{ ansible_user }}/infrastructure/services/invoiceplane/docker-compose.yaml /home/{{ ansible_user }}/infrastructure/services/traefik/docker-compose.yaml"
+    allow_list_files_to_update:
+      - "/home/{{ ansible_user }}/infrastructure/services/whoami/docker-compose.yaml"
+      - "/home/{{ ansible_user }}/infrastructure/services/shlink/docker-compose.yaml"
+      - "/home/{{ ansible_user }}/infrastructure/services/portainer/docker-compose.yaml"
+      - "/home/{{ ansible_user }}/infrastructure/services/invoiceplane/docker-compose.yaml"
+      - "/home/{{ ansible_user }}/infrastructure/services/traefik/docker-compose.yaml"

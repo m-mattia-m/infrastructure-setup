@@ -7,7 +7,8 @@ services:
     image: shlinkio/shlink:stable
     restart: unless-stopped
     depends_on:
-      - shlink_database
+      shlink_database:
+        condition: service_healthy
     links:
       - shlink_database
     ports:
@@ -88,6 +89,11 @@ services:
       - proxy
     volumes:
       - shlink_db:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "exit | mysql -h localhost -P 3306 -u root -p$${SQL_PASS}" ]
+      interval: 5s
+      timeout: 1s
+      retries: 50
 
 volumes:
   shlink_db:
