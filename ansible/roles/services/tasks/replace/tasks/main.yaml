@@ -6,14 +6,17 @@
     file_type: file
   register: files_to_modify
 
+- name: Convert array to space-separated string if necessary
+  ansible.builtin.set_fact:
+    formatted_replacement: >- # you can't seperate the jinja2-template on several lines otherwise it appears a lint-error
+      {%- if (replacement is iterable) and (replacement is not string) -%}{{ replacement | join(' ') }}{%- else -%}{{ replacement }}{%- endif %}
+
 - name: Replace placeholder with replacement in each file
   ansible.builtin.replace:
     path: "{{ item.path }}"
     regexp: "{{ placeholder | regex_escape }}"
-    replace: "{{ item_replacement }}"
+    replace: "{{ formatted_replacement }}"
   loop: "{{ files_to_modify.files }}"
   loop_control:
     loop_var: item
   when: files_to_modify.matched > 0
-  vars:
-    item_replacement: "{{ replacement }}"

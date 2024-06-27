@@ -1,14 +1,9 @@
-# YOU MUST LINK THE `.env`-FILE FOR THIS DOCKER COMPOSE SETUP: 
-# `docker compose --env-file .env up -d`
-# On account of this reason I decided to replace the environment-variables here during the ansible-instatallation
-
 services:
   shlink:
     image: shlinkio/shlink:stable
     restart: unless-stopped
     depends_on:
-      shlink_database:
-        condition: service_healthy
+      - shlink_database
     links:
       - shlink_database
     ports:
@@ -18,14 +13,15 @@ services:
     environment:
       - TZ=Europe/Zurich
       - IS_HTTPS_ENABLED=true
+      # - SHELL_VERBOSITY=3
+      - SKIP_INITIAL_GEOLITE_DOWNLOAD=true
       - DEFAULT_DOMAIN=${SHLINK_SERVER_FQDN}
       - DB_DRIVER=maria
-      - DB_USER=${SHLINK_DB_USER}
       - DB_NAME=${SHLINK_DB_NAME}
+      - DB_USER=${SHLINK_DB_USER}
       - DB_PASSWORD=${SHLINK_DB_PASSWORD}
       - DB_HOST=shlink_database
       - DB_PORT=3308
-      - SHELL_VERBOSITY=3
       - INITIAL_API_KEY=${SHLINK_INITIAL_API_KEY}
       - GEOLITE_LICENSE_KEY=${SHLINK_GEOLITE_LICENSE_KEY}
     labels:
@@ -53,11 +49,11 @@ services:
     networks:
       - proxy
     environment:
-        TZ: "Europe/Zurich"
-        PUID: 1000
-        PGID: 1000
-        SHLINK_SERVER_URL: ${SHLINK_SERVER_URL}
-        SHLINK_SERVER_API_KEY: ${SHLINK_INITIAL_API_KEY}
+      - TZ=Europe/Zurich
+      - PUID=1000
+      - PGID=1000
+      - SHLINK_SERVER_URL=${SHLINK_SERVER_URL}
+      - SHLINK_SERVER_API_KEY=${SHLINK_INITIAL_API_KEY}
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.shlink-ui-http.entrypoints=web" # 'web' could be 'http' if also in config file used
@@ -78,22 +74,20 @@ services:
   shlink_database:
     image: mariadb:10.8
     restart: unless-stopped
+    hostname: shlink_database
     ports:
-      - "3308:3306"
+      - "3308:3308"
     environment:
-      - MYSQL_RANDOM_ROOT_PASSWORD=true
+      - MARIADB_RANDOM_ROOT_PASSWORD=true
       - MARIADB_DATABASE=${SHLINK_DB_NAME}
       - MARIADB_USER=${SHLINK_DB_USER}
       - MARIADB_PASSWORD=${SHLINK_DB_PASSWORD}
+      - MYSQL_TCP_PORT=3308
+      - MYSQL_UNIX_PORT=3308
     networks:
       - proxy
     volumes:
       - shlink_db:/var/lib/mysql
-    healthcheck:
-      test: ["CMD-SHELL", "exit | mysql -h localhost -P 3306 -u root -p$${SQL_PASS}" ]
-      interval: 5s
-      timeout: 1s
-      retries: 50
 
 volumes:
   shlink_db:

@@ -95,58 +95,58 @@
     placeholder: "replace.files.to.update"
     replacement: "{{ allow_list_files_to_update }}"
 
-# replace from here, if you find a solution for starting shlink with an .env file
+# # replace from here, if you find a solution for starting shlink with an .env file
 
-- name: Call '${SHLINK_DB_NAME}' replacement tasks
-  ansible.builtin.include_tasks: ./replace/tasks/main.yaml
-  vars:
-    target_directory: "/home/{{ ansible_user }}/infrastructure/services"
-    placeholder: "${SHLINK_DB_NAME}"
-    replacement: "{{ shlink_db_name }}"
+# - name: Call '${SHLINK_DB_NAME}' replacement tasks
+#   ansible.builtin.include_tasks: ./replace/tasks/main.yaml
+#   vars:
+#     target_directory: "/home/{{ ansible_user }}/infrastructure/services"
+#     placeholder: "${SHLINK_DB_NAME}"
+#     replacement: "{{ shlink_db_name }}"
 
-- name: Call '${SHLINK_DB_USER}' replacement tasks
-  ansible.builtin.include_tasks: ./replace/tasks/main.yaml
-  vars:
-    target_directory: "/home/{{ ansible_user }}/infrastructure/services"
-    placeholder: "${SHLINK_DB_USER}"
-    replacement: "{{ shlink_db_user }}"
+# - name: Call '${SHLINK_DB_USER}' replacement tasks
+#   ansible.builtin.include_tasks: ./replace/tasks/main.yaml
+#   vars:
+#     target_directory: "/home/{{ ansible_user }}/infrastructure/services"
+#     placeholder: "${SHLINK_DB_USER}"
+#     replacement: "{{ shlink_db_user }}"
 
-- name: Call '${SHLINK_DB_PASSWORD}' replacement tasks
-  ansible.builtin.include_tasks: ./replace/tasks/main.yaml
-  vars:
-    target_directory: "/home/{{ ansible_user }}/infrastructure/services"
-    placeholder: "${SHLINK_DB_PASSWORD}"
-    replacement: "{{ shlink_db_password }}"
+# - name: Call '${SHLINK_DB_PASSWORD}' replacement tasks
+#   ansible.builtin.include_tasks: ./replace/tasks/main.yaml
+#   vars:
+#     target_directory: "/home/{{ ansible_user }}/infrastructure/services"
+#     placeholder: "${SHLINK_DB_PASSWORD}"
+#     replacement: "{{ shlink_db_password }}"
 
-- name: Call '${SHLINK_GEOLITE_LICENSE_KEY}' replacement tasks
-  ansible.builtin.include_tasks: ./replace/tasks/main.yaml
-  vars:
-    target_directory: "/home/{{ ansible_user }}/infrastructure/services"
-    placeholder: "${SHLINK_GEOLITE_LICENSE_KEY}"
-    replacement: "{{ shlink_init_api_key }}"
+# - name: Call '${SHLINK_GEOLITE_LICENSE_KEY}' replacement tasks
+#   ansible.builtin.include_tasks: ./replace/tasks/main.yaml
+#   vars:
+#     target_directory: "/home/{{ ansible_user }}/infrastructure/services"
+#     placeholder: "${SHLINK_GEOLITE_LICENSE_KEY}"
+#     replacement: "{{ shlink_init_api_key }}"
 
-- name: Call '${SHLINK_INITIAL_API_KEY}' replacement tasks
-  ansible.builtin.include_tasks: ./replace/tasks/main.yaml
-  vars:
-    target_directory: "/home/{{ ansible_user }}/infrastructure/services"
-    placeholder: "${SHLINK_INITIAL_API_KEY}"
-    replacement: "{{ shlink_geoligt_license_key }}"
+# - name: Call '${SHLINK_INITIAL_API_KEY}' replacement tasks
+#   ansible.builtin.include_tasks: ./replace/tasks/main.yaml
+#   vars:
+#     target_directory: "/home/{{ ansible_user }}/infrastructure/services"
+#     placeholder: "${SHLINK_INITIAL_API_KEY}"
+#     replacement: "{{ shlink_geoligt_license_key }}"
 
-- name: Call '${SHLINK_SERVER_FQDN}' replacement tasks
-  ansible.builtin.include_tasks: ./replace/tasks/main.yaml
-  vars:
-    target_directory: "/home/{{ ansible_user }}/infrastructure/services"
-    placeholder: "${SHLINK_SERVER_FQDN}"
-    replacement: "{{ shlink_server_fqdn }}"
+# - name: Call '${SHLINK_SERVER_FQDN}' replacement tasks
+#   ansible.builtin.include_tasks: ./replace/tasks/main.yaml
+#   vars:
+#     target_directory: "/home/{{ ansible_user }}/infrastructure/services"
+#     placeholder: "${SHLINK_SERVER_FQDN}"
+#     replacement: "{{ shlink_server_fqdn }}"
 
-- name: Call '${SHLINK_UI_FQDN}' replacement tasks
-  ansible.builtin.include_tasks: ./replace/tasks/main.yaml
-  vars:
-    target_directory: "/home/{{ ansible_user }}/infrastructure/services"
-    placeholder: "${SHLINK_SERVER_URL}"
-    replacement: "{{ shlink_server_url }}"
+# - name: Call '${SHLINK_UI_FQDN}' replacement tasks
+#   ansible.builtin.include_tasks: ./replace/tasks/main.yaml
+#   vars:
+#     target_directory: "/home/{{ ansible_user }}/infrastructure/services"
+#     placeholder: "${SHLINK_SERVER_URL}"
+#     replacement: "{{ shlink_server_url }}"
 
-# replace until here, if you find a solution for starting shlink with an .env file
+# # replace until here, if you find a solution for starting shlink with an .env file
 
 - name: Create cron-job for dynDNS-check every day at 2am
   ansible.builtin.cron:

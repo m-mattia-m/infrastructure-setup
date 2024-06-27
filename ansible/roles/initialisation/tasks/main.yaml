@@ -41,7 +41,9 @@
     state: present
   become: true
 
-## This OpenVPN Access Server installation works fine but I have trouble with the ports. If I start OpenVPN it uses port 443 which is needed for traefik TLS routing (I don't want to change the default port.)
+## This OpenVPN Access Server installation works fine but I have trouble with the ports.
+## If I start OpenVPN it uses port 443 which is needed for traefik TLS routing (I don't want to change the default port.)
+#
 # - name: Copy and execute open-vpn-server installation script
 #   vars:
 #     script_path: "{{ role_path }}/scripts/open-vpn-server-installation.sh"
