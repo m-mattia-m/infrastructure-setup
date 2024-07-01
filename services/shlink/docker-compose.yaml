@@ -2,18 +2,19 @@ services:
   shlink:
     image: shlinkio/shlink:stable
     restart: unless-stopped
-    depends_on:
-      - shlink_database
+    # depends_on:
+    #   - shlink_database
     links:
       - shlink_database
     ports:
       - 8991:8080
     networks:
       - proxy
+      - internal
     environment:
       - TZ=Europe/Zurich
       - IS_HTTPS_ENABLED=true
-      # - SHELL_VERBOSITY=3
+      - SHELL_VERBOSITY=3
       - SKIP_INITIAL_GEOLITE_DOWNLOAD=true
       - DEFAULT_DOMAIN=${SHLINK_SERVER_FQDN}
       - DB_DRIVER=maria
@@ -21,7 +22,7 @@ services:
       - DB_USER=${SHLINK_DB_USER}
       - DB_PASSWORD=${SHLINK_DB_PASSWORD}
       - DB_HOST=shlink_database
-      - DB_PORT=3308
+      # - DB_PORT=3308
       - INITIAL_API_KEY=${SHLINK_INITIAL_API_KEY}
       - GEOLITE_LICENSE_KEY=${SHLINK_GEOLITE_LICENSE_KEY}
     labels:
@@ -75,17 +76,17 @@ services:
     image: mariadb:10.8
     restart: unless-stopped
     hostname: shlink_database
-    ports:
-      - "3308:3308"
+    networks:
+      - internal
+    # ports:
+    #   - "3308:3308"
     environment:
       - MARIADB_RANDOM_ROOT_PASSWORD=true
       - MARIADB_DATABASE=${SHLINK_DB_NAME}
       - MARIADB_USER=${SHLINK_DB_USER}
       - MARIADB_PASSWORD=${SHLINK_DB_PASSWORD}
-      - MYSQL_TCP_PORT=3308
-      - MYSQL_UNIX_PORT=3308
-    networks:
-      - proxy
+      # - MYSQL_TCP_PORT=3308
+      # - MYSQL_UNIX_PORT=3308
     volumes:
       - shlink_db:/var/lib/mysql
 
@@ -95,3 +96,5 @@ volumes:
 networks:
   proxy:
     external: true
+  internal:
+    internal: true

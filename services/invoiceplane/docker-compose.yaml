@@ -14,11 +14,12 @@ services:
         MYSQL_USER: "${INVOICEPLANE_DB_USER}"
         MYSQL_PASSWORD: "${INVOICEPLANE_DB_PASSWORD}"
         MYSQL_DB: "${INVOICEPLANE_DB_NAME}"
-        MYSQL_PORT: 3307
+        MYSQL_PORT: 3306
         IP_URL: "${INVOICEPLANE_HOST}"
         DISABLE_SETUP: false
     networks:
       - proxy
+      - internal
     depends_on:
       - invoiceplane_mysql
     labels:
@@ -45,18 +46,17 @@ services:
     hostname: invoiceplane_mysql
     restart: unless-stopped
     networks:
-      - proxy
-    ports:
-     - '3307:3306'
+      - internal
+    # ports:
+    #  - '3306:3306'
     environment:
       MYSQL_DATABASE: "${INVOICEPLANE_DB_NAME}"
-      MYSQL_RANDOM_ROOT_PASSWORD: 'true'
+      MYSQL_ROOT_PASSWORD: 'root' # MYSQL_RANDOM_ROOT_PASSWORD
       MYSQL_USER: "${INVOICEPLANE_DB_USER}"
       MYSQL_PASSWORD: "${INVOICEPLANE_DB_PASSWORD}"
     volumes:
       - invoiceplane_db:/var/lib/mysql
     labels:
-      - "traefik.enable=false"
       - "docker-volume-backup.stop-during-backup=true"
 
 volumes:
@@ -65,3 +65,5 @@ volumes:
 networks:
   proxy:
     external: true
+  internal:
+    internal: true
