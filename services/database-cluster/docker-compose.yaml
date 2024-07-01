@@ -1,0 +1,21 @@
+services:
+  database:
+    image: mysql:8.0
+    container_name: database
+    hostname: database
+    restart: unless-stopped
+    networks:
+      - internal
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_CLUSTER_ROOT_PASSWORD}
+    volumes:
+      - database:/var/lib/mysql
+    labels:
+      - "docker-volume-backup.stop-during-backup=true"
+
+volumes:
+  database:
+
+networks:
+  internal:
+    internal: true

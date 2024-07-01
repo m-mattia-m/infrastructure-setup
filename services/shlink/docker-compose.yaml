@@ -2,12 +2,8 @@ services:
   shlink:
     image: shlinkio/shlink:stable
     restart: unless-stopped
-    # depends_on:
-    #   - shlink_database
     links:
       - shlink_database
-    ports:
-      - 8991:8080
     networks:
       - proxy
       - internal
@@ -17,12 +13,11 @@ services:
       - SHELL_VERBOSITY=3
       - SKIP_INITIAL_GEOLITE_DOWNLOAD=true
       - DEFAULT_DOMAIN=${SHLINK_SERVER_FQDN}
-      - DB_DRIVER=maria
-      - DB_NAME=${SHLINK_DB_NAME}
-      - DB_USER=${SHLINK_DB_USER}
+      - DB_DRIVER=mysql
+      - DB_NAME=shlink
+      - DB_USER=shlink
       - DB_PASSWORD=${SHLINK_DB_PASSWORD}
-      - DB_HOST=shlink_database
-      # - DB_PORT=3308
+      - DB_HOST=database
       - INITIAL_API_KEY=${SHLINK_INITIAL_API_KEY}
       - GEOLITE_LICENSE_KEY=${SHLINK_GEOLITE_LICENSE_KEY}
     labels:
@@ -71,27 +66,6 @@ services:
       - "traefik.http.routers.shlink-ui-https.middlewares=shlink-ui-https@docker" # important to add the middleware to your router
       - "traefik.http.routers.shlink-ui-http.middlewares=shlink-ui-http@docker" # important to add the middleware to your router
       # no allow-list on account of accessing from IP-adresses which are not from home
-
-  shlink_database:
-    image: mariadb:10.8
-    restart: unless-stopped
-    hostname: shlink_database
-    networks:
-      - internal
-    # ports:
-    #   - "3308:3308"
-    environment:
-      - MARIADB_RANDOM_ROOT_PASSWORD=true
-      - MARIADB_DATABASE=${SHLINK_DB_NAME}
-      - MARIADB_USER=${SHLINK_DB_USER}
-      - MARIADB_PASSWORD=${SHLINK_DB_PASSWORD}
-      # - MYSQL_TCP_PORT=3308
-      # - MYSQL_UNIX_PORT=3308
-    volumes:
-      - shlink_db:/var/lib/mysql
-
-volumes:
-  shlink_db:
 
 networks:
   proxy:

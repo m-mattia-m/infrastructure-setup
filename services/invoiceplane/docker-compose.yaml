@@ -6,22 +6,18 @@ services:
     hostname: invoiceplane
     image: mhzawadi/invoiceplane:1.6.0
     restart: unless-stopped
-    ports:
-        - 8992:80
     environment:
         TZ: "Europe/Zurich"
-        MYSQL_HOST: "invoiceplane_mysql"
-        MYSQL_USER: "${INVOICEPLANE_DB_USER}"
+        MYSQL_HOST: "database"
+        MYSQL_DB: "invoiceplane"
+        MYSQL_USER: "invoiceplane"
         MYSQL_PASSWORD: "${INVOICEPLANE_DB_PASSWORD}"
-        MYSQL_DB: "${INVOICEPLANE_DB_NAME}"
         MYSQL_PORT: 3306
         IP_URL: "${INVOICEPLANE_HOST}"
         DISABLE_SETUP: false
     networks:
       - proxy
       - internal
-    depends_on:
-      - invoiceplane_mysql
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.invoiceplane-http.entrypoints=web" # 'web' could be 'http' if also in config file used
@@ -39,28 +35,6 @@ services:
       - "traefik.http.middlewares.invoiceplane-https.ipwhitelist.sourcerange=${remote.host.ip.or.dyndns}"
       - "traefik.http.routers.invoiceplane-https.middlewares=invoiceplane-https@docker" # important to add the middleware to your router
       - "traefik.http.routers.invoiceplane-http.middlewares=invoiceplane-http@docker" # important to add the middleware to your router
-
-  invoiceplane_mysql:
-    image: mysql:8.0
-    container_name: invoiceplane_mysql
-    hostname: invoiceplane_mysql
-    restart: unless-stopped
-    networks:
-      - internal
-    # ports:
-    #  - '3306:3306'
-    environment:
-      MYSQL_DATABASE: "${INVOICEPLANE_DB_NAME}"
-      MYSQL_ROOT_PASSWORD: 'root' # MYSQL_RANDOM_ROOT_PASSWORD
-      MYSQL_USER: "${INVOICEPLANE_DB_USER}"
-      MYSQL_PASSWORD: "${INVOICEPLANE_DB_PASSWORD}"
-    volumes:
-      - invoiceplane_db:/var/lib/mysql
-    labels:
-      - "docker-volume-backup.stop-during-backup=true"
-
-volumes:
-  invoiceplane_db:
 
 networks:
   proxy:
