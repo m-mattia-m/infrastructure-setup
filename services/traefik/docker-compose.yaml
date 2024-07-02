@@ -37,8 +37,8 @@ services:
       - "traefik.http.routers.traefik-https.tls.domains[0].main={ansible.fqdn}"
       - "traefik.http.routers.traefik-https.tls.domains[0].sans=*.{ansible.fqdn}"
       - "traefik.http.routers.traefik-https.service=api@internal"
-      - "traefik.http.middlewares.traefik-https.ipwhitelist.sourcerange=${remote.host.ip.or.dyndns}"
-      - "traefik.http.middlewares.traefik-http.ipwhitelist.sourcerange=${remote.host.ip.or.dyndns}"
+      - "traefik.http.middlewares.traefik-https.ipallowlist.sourcerange=${remote.host.ip.or.dyndns}"
+      - "traefik.http.middlewares.traefik-http.ipallowlist.sourcerange=${remote.host.ip.or.dyndns}"
       - "traefik.http.routers.traefik-https.middlewares=traefik-https@docker" # important to add the middleware to your router
       - "traefik.http.routers.traefik-http.middlewares=traefik-http@docker" # important to add the middleware to your router
 
