@@ -16,9 +16,15 @@
     mode: "0600"
 
 - name: Create docker proxy network
-  become: true # run command with sudo access
-  community.docker.docker_network:
+  become: true
+  ansible.builtin.docker_network:
     name: proxy
+
+- name: Create docker data-net network
+  become: true
+  ansible.builtin.docker_network:
+    name: data-net
+    internal: true
 
 - name: S3 File Downloader
   ansible.builtin.include_tasks: ./backup-restore/tasks/main.yaml
@@ -79,7 +85,7 @@
   vars:
     target_directory: /home/{{ ansible_user }}/infrastructure/services
     placeholder: "${caServer}"
-    replacement: "{{ ca_server }}" # For testing
+    replacement: "{{ ca_server }}"
 
 - name: Call 'AllowList - DynDNS script' replacement tasks
   ansible.builtin.include_tasks: ./replace/tasks/main.yaml

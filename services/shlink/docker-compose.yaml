@@ -6,7 +6,7 @@ services:
       - "8991:80"
     networks:
       - proxy
-      - database-cluster_internal
+      - data-net
     environment:
       - TZ=Europe/Zurich
       - IS_HTTPS_ENABLED=true
@@ -68,5 +68,5 @@ services:
 networks:
   proxy:
     external: true
-  database-cluster_internal:
+  data-net:
     external: true

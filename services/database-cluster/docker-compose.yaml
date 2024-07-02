@@ -7,7 +7,7 @@ services:
     ports:
       - "3306:3306"
     networks:
-      - internal
+      - data-net
     environment:
       MYSQL_ROOT_PASSWORD: ${DB_CLUSTER_ROOT_PASSWORD}
     volumes:
@@ -19,5 +19,5 @@ volumes:
   database:
 
 networks:
-  internal:
-    internal: true
+  data-net:
+    external: true

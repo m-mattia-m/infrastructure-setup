@@ -19,7 +19,7 @@ services:
         DISABLE_SETUP: false
     networks:
       - proxy
-      - database-cluster_internal
+      - data-net
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.invoiceplane-http.entrypoints=web" # 'web' could be 'http' if also in config file used
@@ -41,5 +41,5 @@ services:
 networks:
   proxy:
     external: true
-  database-cluster_internal:
+  data-net:
     external: true
