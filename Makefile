@@ -64,6 +64,7 @@ set-ansible-varialbes:
 	@echo "--------------------------------------------------"
 	@echo "              Set ansible variables               "
 	@echo "--------------------------------------------------"
+	@awk '!/  vars:/ {print} /  vars:/ {exit}' ansible/playbook.yaml > temp && mv temp ansible/playbook.yaml && rm -f temp
 	@echo "  vars:" >> ansible/playbook.yaml
 	@echo "    allowed_dyn_dns: \"$(ALLOWED_DYN_DNS)\"" >> ansible/playbook.yaml
 	@echo "    s3_bucket_name: \"$(BACKUP_S3_BUCKET_NAME)\"" >> ansible/playbook.yaml

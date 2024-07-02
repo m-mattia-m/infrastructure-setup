@@ -121,8 +121,18 @@
   community.docker.docker_compose_v2:
     project_src: /home/{{ ansible_user }}/infrastructure/services/database-cluster
 
+- name: Connect database container to bridge network for mysql commands
+  ansible.builtin.docker_network:
+    name: proxy
+    connected:
+      - database
+    appends: true
+
+# https://github.com/ansible-collections/community.mysql/issues/85?ref=https://coder.social#issuecomment-758187493
 - name: Create databases 'shlink' and 'invoiceplane'
-  community.mysql.mysql_db:
+  ansible.builtin.mysql_db:
+    login_host: 127.0.0.1 # localhost -> unix-socket; 127.0.0.1 -> TCP
+    login_port: 3306
     login_user: root
     login_password: root
     name:
@@ -131,7 +141,7 @@
     state: present
 
 - name: Create DB user 'shlink'
-  community.mysql.mysql_user:
+  ansible.builtin.mysql_user:
     login_user: root
     login_password: root
     name: 'shlink'
@@ -140,11 +150,17 @@
     state: present
 
 - name: Create DB user 'shlink'
-  community.mysql.mysql_user:
+  ansible.builtin.mysql_user:
     name: 'invoiceplane'
     password: '{{ invoiceplane_db_password }}'
     priv: '*.*:ALL'
     state: present
+
+- name: Disconnect database container from bridge network after mysql commands
+  ansible.builtin.docker_network:
+    name: proxy
+    state: absent
+    container: database
 
 - name: Start traefik
   become: true

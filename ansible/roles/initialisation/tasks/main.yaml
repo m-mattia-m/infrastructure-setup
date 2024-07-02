@@ -41,6 +41,27 @@
     state: present
   become: true
 
+- name: Install python-3-pip via apt
+  become: true
+  ansible.builtin.apt:
+    name: python3-pip
+    state: present
+    update_cache: true
+
+- name: Install python-3-pip via apt
+  become: true
+  ansible.builtin.apt:
+    name: python3-pip
+    state: present
+    update_cache: true
+
+- name: Install pymysql via pip and make sure pymysql is present
+  become: true
+  ansible.builtin.pip:
+    name: pymysql
+    state: present
+    break_system_packages: true
+
 ## This OpenVPN Access Server installation works fine but I have trouble with the ports.
 ## If I start OpenVPN it uses port 443 which is needed for traefik TLS routing (I don't want to change the default port.)
 #
@@ -48,7 +69,7 @@
 #   vars:
 #     script_path: "{{ role_path }}/scripts/open-vpn-server-installation.sh"
 #     target_directory: "/home/{{ ansible_user }}/open-vpn-access-server-log.txt"
-#   ansible.builtin.include_tasks: ./run-script-print-logs/tasks/main.yaml
+#   ansible.builtin.include_tasks: ./run-script-pr¨¨int-logs/tasks/main.yaml
 
 # - name: Extract and print specific section from remote file
 #   ansible.builtin.include_tasks: ./print-to-localhost/tasks/main.yaml
