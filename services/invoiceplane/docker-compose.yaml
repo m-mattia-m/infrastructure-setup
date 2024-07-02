@@ -7,7 +7,7 @@ services:
     image: mhzawadi/invoiceplane:1.6.0
     restart: unless-stopped
     ports:
-      - "8081:80"
+      - "8992:80"
     environment:
         TZ: "Europe/Zurich"
         MYSQL_HOST: "database"
@@ -19,7 +19,7 @@ services:
         DISABLE_SETUP: false
     networks:
       - proxy
-      - internal
+      - database-cluster_internal
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.invoiceplane-http.entrypoints=web" # 'web' could be 'http' if also in config file used
@@ -33,16 +33,10 @@ services:
       # - "traefik.http.routers.invoiceplane-https.middlewares=traefik-auth"
       - "traefik.http.routers.invoiceplane-https.tls=true"
       - "traefik.http.routers.invoiceplane-https.tls.certresolver=infomaniak"
-      # - "traefik.http.middlewares.invoiceplane-http.ipwhitelist.sourcerange=${remote.host.ip.or.dyndns}"
-      # - "traefik.http.middlewares.invoiceplane-https.ipwhitelist.sourcerange=${remote.host.ip.or.dyndns}"
-      # - "traefik.http.routers.invoiceplane-https.middlewares=invoiceplane-https@docker" # important to add the middleware to your router
-      # - "traefik.http.routers.invoiceplane-http.middlewares=invoiceplane-http@docker" # important to add the middleware to your router
-
-# networks:
-#   proxy:
-#     external: true
-#   internal:
-#     internal: true
+      - "traefik.http.middlewares.invoiceplane-http.ipwhitelist.sourcerange=${remote.host.ip.or.dyndns}"
+      - "traefik.http.middlewares.invoiceplane-https.ipwhitelist.sourcerange=${remote.host.ip.or.dyndns}"
+      - "traefik.http.routers.invoiceplane-https.middlewares=invoiceplane-https@docker" # important to add the middleware to your router
+      - "traefik.http.routers.invoiceplane-http.middlewares=invoiceplane-http@docker" # important to add the middleware to your router
 
 networks:
   proxy:
