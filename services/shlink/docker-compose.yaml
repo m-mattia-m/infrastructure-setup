@@ -2,8 +2,8 @@ services:
   shlink:
     image: shlinkio/shlink:stable
     restart: unless-stopped
-    links:
-      - shlink_database
+    ports:
+      - "8082:80"
     networks:
       - proxy
       - internal
@@ -67,8 +67,14 @@ services:
       - "traefik.http.routers.shlink-ui-http.middlewares=shlink-ui-http@docker" # important to add the middleware to your router
       # no allow-list on account of accessing from IP-adresses which are not from home
 
+# networks:
+#   proxy:
+#     external: true
+#   internal:
+#     internal: true
+
 networks:
   proxy:
     external: true
-  internal:
-    internal: true
+  database-cluster_internal:
+    external: true

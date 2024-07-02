@@ -128,6 +128,13 @@
       - database
     appends: true
 
+- name: Wait until DB is ready
+  ansible.builtin.wait_for:
+    host: 127.0.0.1
+    port: 3306
+    delay: 10
+    timeout: 30
+
 # https://github.com/ansible-collections/community.mysql/issues/85?ref=https://coder.social#issuecomment-758187493
 - name: Create databases 'shlink' and 'invoiceplane'
   ansible.builtin.mysql_db:
@@ -142,6 +149,8 @@
 
 - name: Create DB user 'shlink'
   ansible.builtin.mysql_user:
+    login_host: 127.0.0.1 # localhost -> unix-socket; 127.0.0.1 -> TCP
+    login_port: 3306
     login_user: root
     login_password: root
     name: 'shlink'
@@ -151,16 +160,19 @@
 
 - name: Create DB user 'shlink'
   ansible.builtin.mysql_user:
+    login_host: 127.0.0.1 # localhost -> unix-socket; 127.0.0.1 -> TCP
+    login_port: 3306
+    login_user: root
+    login_password: root
     name: 'invoiceplane'
     password: '{{ invoiceplane_db_password }}'
     priv: '*.*:ALL'
     state: present
 
-- name: Disconnect database container from bridge network after mysql commands
-  ansible.builtin.docker_network:
-    name: proxy
-    state: absent
-    container: database
+- name: Disconnect database container from proxy network after run mysql commands
+  become: true
+  ansible.builtin.command: "docker network disconnect proxy database"
+  failed_when: false
 
 - name: Start traefik
   become: true
