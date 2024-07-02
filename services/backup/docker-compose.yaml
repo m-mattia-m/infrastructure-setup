@@ -3,7 +3,7 @@ services:
     image: jareware/docker-volume-backup
     networks:
       - proxy
-      - database-cluster_internal
+      - data-net
     environment:
       AWS_EXTRA_ARGS: "--endpoint-url ${BACKUP_S3_HOST}"
       AWS_DEFAULT_REGION: "${BACKUP_S3_REGION}"
@@ -27,5 +27,5 @@ volumes:
 networks:
   proxy:
     external: true
-  database-cluster_internal:
+  data-net:
     external: true
