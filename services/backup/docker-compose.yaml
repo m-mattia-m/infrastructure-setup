@@ -13,12 +13,15 @@ services:
       BACKUP_CRON_EXPRESSION: "0 4 * * *" # "0 4 * * *" # "* * * * *
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro # Allow use of the "stop-during-backup" feature
-      - database-compose_database:/backup/shlink_db:ro
+      - database-cluster_database:/backup/shlink_db:ro
+      - portainer_portainer_data:/backup/shlink_db:ro
     labels:
       - "traefik.enable=false"
 
 volumes:
-  database-compose_database:
+  database-cluster_database:
+    external: true
+  portainer_portainer_data:
     external: true
 
 networks:
