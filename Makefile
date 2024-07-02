@@ -33,8 +33,6 @@ generate-environment:
 	" | sed 's/^[[:space:]]*//g' > ./services/database-cluster/.env
 	@echo "------------- Set shlink environment -------------"
 	@echo "\
-		SHLINK_DB_NAME=\"$(SHLINK_DB_NAME)\"\n\
-		SHLINK_DB_USER=\"$(SHLINK_DB_USER)\"\n\
 		SHLINK_DB_PASSWORD=\"$(SHLINK_DB_PASSWORD)\"\n\
 		SHLINK_GEOLITE_LICENSE_KEY=\"$(SHLINK_GEOLITE_LICENSE_KEY)\"\n\
 		SHLINK_INITIAL_API_KEY=\"$(SHLINK_INITIAL_API_KEY)\"\n\
@@ -44,9 +42,7 @@ generate-environment:
 	@echo "--------- Set invoiceplane environment -----------"
 	@echo "\
 		INVOICEPLANE_HOST=\"$(INVOICEPLANE_HOST)\"\n\
-		INVOICEPLANE_DB_USER=\"$(INVOICEPLANE_DB_USER)\"\n\
 		INVOICEPLANE_DB_PASSWORD=\"$(INVOICEPLANE_DB_PASSWORD)\"\n\
-		INVOICEPLANE_DB_NAME=\"$(INVOICEPLANE_DB_NAME)\"\n\
 	" | sed 's/^[[:space:]]*//g' > ./services/invoiceplane/.env
 	@echo "----------- Set portainer environment ------------"
 	@echo "\
