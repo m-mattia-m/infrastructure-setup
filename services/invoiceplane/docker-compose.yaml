@@ -22,6 +22,7 @@ services:
       - data-net
     labels:
       - "traefik.enable=true"
+      - "traefik.docker.network=proxy" # is to define which network should be used for traeffik (only needed if multiple networks are linked)
       - "traefik.http.routers.invoiceplane-http.entrypoints=web" # 'web' could be 'http' if also in config file used
       - "traefik.http.routers.invoiceplane-http.rule=Host(`{invoiceplane.fqdn}`)"
       # - "traefik.http.middlewares.traefik-auth.basicauth.users=${TRAEFIK_DASHBOARD_CREDENTIALS}"

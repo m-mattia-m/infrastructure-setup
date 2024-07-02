@@ -23,6 +23,7 @@ services:
       - /home/${ANSIBLE_USER}/infrastructure/services/traefik/data/acme.json:/acme.json
     labels:
       - "traefik.enable=true"
+      - "traefik.docker.network=proxy"
       - "traefik.http.routers.traefik-http.entrypoints=web" # 'web' could be 'http' if also in config file used
       - "traefik.http.routers.traefik-http.rule=Host(`traefik.{ansible.fqdn}`)"
       # - "traefik.http.middlewares.traefik-auth.basicauth.users=${TRAEFIK_DASHBOARD_CREDENTIALS}"

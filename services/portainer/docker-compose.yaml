@@ -21,7 +21,9 @@ services:
     networks:
       - proxy
     labels:
+      - "docker-volume-backup.stop-during-backup=true"
       - "traefik.enable=true"
+      - "traefik.docker.network=proxy"
       - "traefik.http.routers.portainer-http.entrypoints=web" # 'web' could be 'http' if also in config file used
       - "traefik.http.routers.portainer-http.rule=Host(`portainer.{portainer.fqdn}`)"
       # - "traefik.http.middlewares.traefik-auth.basicauth.users=${TRAEFIK_DASHBOARD_CREDENTIALS}"
@@ -34,7 +36,6 @@ services:
       - "traefik.http.routers.portainer-https.tls=true"
       - "traefik.http.routers.portainer-https.tls.certresolver=infomaniak"
       - "traefik.http.services.portainer.loadbalancer.server.port=9000"
-      - "docker-volume-backup.stop-during-backup=true"
       - "traefik.http.middlewares.portainer-https.ipallowlist.sourcerange=${remote.host.ip.or.dyndns}"
       - "traefik.http.middlewares.portainer-http.ipallowlist.sourcerange=${remote.host.ip.or.dyndns}"
       - "traefik.http.routers.portainer-https.middlewares=portainer-https@docker" # important to add the middleware to your router
