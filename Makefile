@@ -5,6 +5,7 @@ entrypoint:
 	@echo ">>> choose a valid script"
 	@echo "- install-ansible"
 	@echo "- generate-environment"
+	@echo "- set-ansible-varialbes"
 	@echo "- new-node"
 	@echo "- new-clean-node"
 	@echo "- new-restored-node"

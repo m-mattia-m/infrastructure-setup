@@ -60,7 +60,6 @@
     placeholder: "{shlink.fqdn.ui}"
     replacement: "{{ shlink_ui_fqdn }}"
 
-
 - name: Call 'invoiceplane-fqdn' replacement tasks
   ansible.builtin.include_tasks: ./replace/tasks/main.yaml
   vars:
