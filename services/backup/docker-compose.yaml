@@ -26,6 +26,6 @@ volumes:
 
 networks:
   proxy:
-    external: true
+    internal: false
   data-net:
     external: true

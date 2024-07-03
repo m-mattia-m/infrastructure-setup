@@ -8,6 +8,7 @@ services:
       - "3306:3306"
     networks:
       - data-net
+      - proxy
     environment:
       MYSQL_ROOT_PASSWORD: ${DB_CLUSTER_ROOT_PASSWORD}
     volumes:
@@ -19,5 +20,7 @@ volumes:
   database:
 
 networks:
+  proxy:
+    internal: false
   data-net:
     external: true
