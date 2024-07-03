@@ -5,8 +5,8 @@ services:
     ports:
       - "8991:80"
     networks:
-      - proxy
       - data-net
+      - proxy
     environment:
       - TZ=Europe/Zurich
       - IS_HTTPS_ENABLED=true
@@ -60,14 +60,15 @@ services:
       - "traefik.http.routers.shlink-ui-https.rule=Host(`{shlink.fqdn.ui}`)"
       - "traefik.http.routers.shlink-ui-https.tls=true"
       - "traefik.http.routers.shlink-ui-https.tls.certresolver=infomaniak"
-      - "traefik.http.middlewares.shlink-ui-https.ipallowlist.sourcerange=${remote.host.ip.or.dyndns}"
-      - "traefik.http.middlewares.shlink-ui-http.ipallowlist.sourcerange=${remote.host.ip.or.dyndns}"
-      - "traefik.http.routers.shlink-ui-https.middlewares=shlink-ui-https@docker" # important to add the middleware to your router
-      - "traefik.http.routers.shlink-ui-http.middlewares=shlink-ui-http@docker" # important to add the middleware to your router
+      # - "traefik.http.middlewares.shlink-ui-https.ipallowlist.sourcerange=${remote.host.ip.or.dyndns}"
+      # - "traefik.http.middlewares.shlink-ui-http.ipallowlist.sourcerange=${remote.host.ip.or.dyndns}"
+      # - "traefik.http.routers.shlink-ui-https.middlewares=shlink-ui-https@docker" # important to add the middleware to your router
+      # - "traefik.http.routers.shlink-ui-http.middlewares=shlink-ui-http@docker" # important to add the middleware to your router
       # no allow-list on account of accessing from IP-adresses which are not from home
 
 networks:
-  proxy:
-    internal: false
   data-net:
     external: true
+  proxy:
+    external: true
+    internal: false
