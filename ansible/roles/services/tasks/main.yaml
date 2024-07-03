@@ -149,12 +149,6 @@
     timeout: 50
 
 # https://github.com/ansible-collections/community.mysql/issues/85?ref=https://coder.social#issuecomment-758187493
-
-- name: Ensure MySQL Python package is installed
-  ansible.builtin.pip:
-    name: mysql-python
-    state: present
-
 - name: Drop existing database 'shlink'
   ansible.builtin.mysql_db:
     login_host: 127.0.0.1 # localhost -> unix-socket; 127.0.0.1 -> TCP
@@ -232,14 +226,14 @@
     priv: '*.*:ALL'
     state: present
 
-- name: Flush MySQL privileges
-  ansible.builtin.mysql_db:
-    login_host: 127.0.0.1 # localhost -> unix-socket; 127.0.0.1 -> TCP
-    login_port: 3306
-    login_user: root
-    login_password: "{{ db_cluster_root_password }}"
-    name: '*.*'
-    state: flush_privs
+# - name: Flush MySQL privileges
+#   ansible.builtin.mysql_db:
+#     login_host: 127.0.0.1 # localhost -> unix-socket; 127.0.0.1 -> TCP
+#     login_port: 3306
+#     login_user: root
+#     login_password: "{{ db_cluster_root_password }}"
+#     name: '*.*'
+#     state: flush_privs
 
 # - name: Disconnect database container from proxy network after run mysql commands
 #   become: true
