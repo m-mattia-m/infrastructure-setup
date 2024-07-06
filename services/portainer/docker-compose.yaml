@@ -47,4 +47,5 @@ volumes:
 
 networks:
   proxy:
+    external: true
     internal: false

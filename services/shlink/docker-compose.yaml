@@ -1,4 +1,5 @@
 services:
+
   shlink:
     image: shlinkio/shlink:stable
     restart: unless-stopped
@@ -10,7 +11,7 @@ services:
     environment:
       - TZ=Europe/Zurich
       - IS_HTTPS_ENABLED=true
-      - SHELL_VERBOSITY=3
+      # - SHELL_VERBOSITY=3 # enable this environment variable for debugging
       - SKIP_INITIAL_GEOLITE_DOWNLOAD=true
       - DEFAULT_DOMAIN=${SHLINK_SERVER_FQDN}
       - DB_DRIVER=mysql
@@ -25,11 +26,13 @@ services:
       - "traefik.docker.network=proxy" # is to define which network should be used for traeffik (only needed if multiple networks are linked)
       - "traefik.http.routers.shlink-backend-http.entrypoints=web" # 'web' could be 'http' if also in config file used
       - "traefik.http.routers.shlink-backend-http.rule=Host(`{shlink.fqdn}`)"
+      # - "traefik.http.middlewares.traefik-auth.basicauth.users=${TRAEFIK_DASHBOARD_CREDENTIALS}"
       - "traefik.http.middlewares.shlink-backend-https-redirect.redirectscheme.scheme=https"
       - "traefik.http.middlewares.sslheader.headers.customrequestheaders.X-Forwarded-Proto=https"
       - "traefik.http.routers.shlink-backend-https.middlewares=shlink-backend-https-redirect"
       - "traefik.http.routers.shlink-backend-https.entrypoints=websecure" # 'websecure' could be 'https' if also in config file used
       - "traefik.http.routers.shlink-backend-https.rule=Host(`{shlink.fqdn}`)"
+      # - "traefik.http.routers.invoiceplane-https.middlewares=traefik-auth"
       - "traefik.http.routers.shlink-backend-https.tls=true"
       - "traefik.http.routers.shlink-backend-https.tls.certresolver=infomaniak"
 
