@@ -4,7 +4,7 @@ services:
     image: shlinkio/shlink:stable
     restart: unless-stopped
     ports:
-      - "8991:80"
+      - "8991:8080"
     networks:
       - data-net
       - proxy
@@ -32,7 +32,7 @@ services:
       - "traefik.http.routers.shlink-backend-https.middlewares=shlink-backend-https-redirect"
       - "traefik.http.routers.shlink-backend-https.entrypoints=websecure" # 'websecure' could be 'https' if also in config file used
       - "traefik.http.routers.shlink-backend-https.rule=Host(`{shlink.fqdn}`)"
-      # - "traefik.http.routers.invoiceplane-https.middlewares=traefik-auth"
+      # - "traefik.http.routers.shlink-backend-https.middlewares=traefik-auth"
       - "traefik.http.routers.shlink-backend-https.tls=true"
       - "traefik.http.routers.shlink-backend-https.tls.certresolver=infomaniak"
 
@@ -63,10 +63,10 @@ services:
       - "traefik.http.routers.shlink-ui-https.rule=Host(`{shlink.fqdn.ui}`)"
       - "traefik.http.routers.shlink-ui-https.tls=true"
       - "traefik.http.routers.shlink-ui-https.tls.certresolver=infomaniak"
-      # - "traefik.http.middlewares.shlink-ui-https.ipallowlist.sourcerange=${remote.host.ip.or.dyndns}"
-      # - "traefik.http.middlewares.shlink-ui-http.ipallowlist.sourcerange=${remote.host.ip.or.dyndns}"
-      # - "traefik.http.routers.shlink-ui-https.middlewares=shlink-ui-https@docker" # important to add the middleware to your router
-      # - "traefik.http.routers.shlink-ui-http.middlewares=shlink-ui-http@docker" # important to add the middleware to your router
+      - "traefik.http.middlewares.shlink-ui-https.ipallowlist.sourcerange=${remote.host.ip.or.dyndns}"
+      - "traefik.http.middlewares.shlink-ui-http.ipallowlist.sourcerange=${remote.host.ip.or.dyndns}"
+      - "traefik.http.routers.shlink-ui-https.middlewares=shlink-ui-https@docker" # important to add the middleware to your router
+      - "traefik.http.routers.shlink-ui-http.middlewares=shlink-ui-http@docker" # important to add the middleware to your router
       # no allow-list on account of accessing from IP-adresses which are not from home
 
 networks:
