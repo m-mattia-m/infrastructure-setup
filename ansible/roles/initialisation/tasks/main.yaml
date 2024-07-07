@@ -76,5 +76,8 @@
 
 # reboot is required for correct docker installation
 - name: Reboot machine
+  become: true
   ansible.builtin.reboot:
     msg: "Rebooting machine in 5 seconds"
+    # post_reboot_delay: 5
+    connect_timeout: 300
