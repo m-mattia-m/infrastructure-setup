@@ -73,3 +73,8 @@
 
 # - name: Extract and print specific section from remote file
 #   ansible.builtin.include_tasks: ./print-to-localhost/tasks/main.yaml
+
+# reboot is required for correct docker installation
+- name: Reboot machine
+  ansible.builtin.reboot:
+    msg: "Rebooting machine in 5 seconds"
