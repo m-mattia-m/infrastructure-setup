@@ -7,11 +7,11 @@ entrypoint:
 	@echo "- generate-environment"
 	@echo "- set-ansible-varialbes"
 	@echo "- new-node"
-	@echo "- new-clean-node"
-	@echo "- new-restored-node"
-	@echo "     -> selects your latest backup"
-	@echo "- new-restored-node-selected-backup"
-	@echo "     -> define the name of your backup you want to restore in the command like: 'make new-restored-node-selected-backup NAME=\"2024-backup\"' "
+# 	 @echo "- new-clean-node"
+# 	 @echo "- new-restored-node"
+# 	 @echo "     -> selects your latest backup"
+# 	 @echo "- new-restored-node-selected-backup"
+#	 @echo "     -> define the name of your backup you want to restore in the command like: 'make new-restored-node-selected-backup NAME=\"2024-backup\"' "
 	@echo "-------------------------------------------------------------------------------"
 
 ### Environment variables
@@ -55,7 +55,7 @@ generate-environment:
 		BACKUP_S3_BUCKET_NAME=\"$(BACKUP_S3_BUCKET_NAME)\"\n\
 		BACKUP_S3_KEY_ID=\"$(BACKUP_S3_KEY_ID)\"\n\
 		BACKUP_S3_ACCESS_KEY=\"$(BACKUP_S3_ACCESS_KEY)\"\n\
-		DB_CLUSTER_ROOT_PASSWORD=\"$(DB_CLUSTER_ROOT_PASSWORD)\"\n
+		DB_CLUSTER_ROOT_PASSWORD=\"$(DB_CLUSTER_ROOT_PASSWORD)\"\n\
 	" | sed 's/^[[:space:]]*//g' > ./services/backup/.env
 
 set-ansible-varialbes:
@@ -101,24 +101,25 @@ new-node:
 	$(MAKE) set-ansible-varialbes
 	ansible-playbook -i ./ansible/hosts.ini ./ansible/playbook.yaml --extra-vars "restore_backup=false"
 
-new-clean-node:
-	@echo "--------------------------------------------------"
-	@echo "           Setup new node with ansible            "
-	@echo "--------------------------------------------------"
-	$(MAKE) set-ansible-varialbes
-	ansible-playbook -i ./ansible/hosts.ini ./ansible/playbook.yaml --extra-vars "restore_backup=false"
+## these endpoints are in development and do not work at the moment
+# new-clean-node:
+# 	@echo "--------------------------------------------------"
+# 	@echo "           Setup new node with ansible            "
+# 	@echo "--------------------------------------------------"
+# 	$(MAKE) set-ansible-varialbes
+# 	ansible-playbook -i ./ansible/hosts.ini ./ansible/playbook.yaml --extra-vars "restore_backup=false"
 
-new-restored-node:
-	@echo "--------------------------------------------------"
-	@echo "    Setup node with last backup through ansible   "
-	@echo "--------------------------------------------------"
-	$(MAKE) set-ansible-varialbes
-	ansible-playbook -i ./ansible/hosts.ini ./ansible/playbook.yaml --extra-vars "restore_backup=true"
+# new-restored-node:
+# 	@echo "--------------------------------------------------"
+# 	@echo "    Setup node with last backup through ansible   "
+# 	@echo "--------------------------------------------------"
+# 	$(MAKE) set-ansible-varialbes
+# 	ansible-playbook -i ./ansible/hosts.ini ./ansible/playbook.yaml --extra-vars "restore_backup=true"
 
-new-restored-node-selected-backup:
-	@echo "--------------------------------------------------"
-	@echo "    Setup node with last backup through ansible   "
-	@echo "--------------------------------------------------"
-	$(MAKE) set-ansible-varialbes
-	$(MAKE) entrypoint NAME=my-latest-backup
-	ansible-playbook -i ./ansible/hosts.ini ./ansible/playbook.yaml --extra-vars "restore_backup=true restore_backup_name='$(NAME)'"
+# new-restored-node-selected-backup:
+# 	@echo "--------------------------------------------------"
+# 	@echo "    Setup node with last backup through ansible   "
+# 	@echo "--------------------------------------------------"
+# 	$(MAKE) set-ansible-varialbes
+# 	$(MAKE) entrypoint NAME=my-latest-backup
+# 	ansible-playbook -i ./ansible/hosts.ini ./ansible/playbook.yaml --extra-vars "restore_backup=true restore_backup_name='$(NAME)'"
