@@ -3,13 +3,10 @@
 # Get the directory of the script
 SCRIPT_DIR=$(dirname "$(readlink -f "$0")")
 
-DATABASES_TO_BACKUP_STRING="shlink,invoiceplane"
+DATABASES_TO_BACKUP_STRING="shlink invoiceplane"
 
 # Set comma as the delimiter
 IFS=','
-
-read -ra DATABASES_TO_BACKUP_ARRAY <<< "$DATABASES_TO_BACKUP_STRING"
-
 
 # Check if .env file exists
 if [ -f "$SCRIPT_DIR/.env" ]; then
@@ -22,40 +19,37 @@ if [ -f "$SCRIPT_DIR/.env" ]; then
     AWS_ACCESS_KEY_ID=$(grep "^BACKUP_S3_KEY_ID=" "$SCRIPT_DIR/.env" | cut -d '=' -f2 | tr -d '"')
     AWS_SECRET_ACCESS_KEY=$(grep "^BACKUP_S3_ACCESS_KEY=" "$SCRIPT_DIR/.env" | cut -d '=' -f2 | tr -d '"')
 
-    for DATABASE in "${DATABASES_TO_BACKUP_ARRAY[@]}"; do
+    echo "start backup for database '$DATABASE'"
 
-        echo "start backup for database '$DATABASE'"
+    # Create the Docker container without starting it
+    CONTAINER_ID=$(docker create \
+        --name mariadb-backup \
+        -e DB_HOST="$DB_HOST" \
+        -e DB_PORT="$DB_PORT" \
+        -e DB_NAME="$DATABASES_TO_BACKUP_STRING" \
+        -e DB_USER="$DB_USER" \
+        -e DB_PASS="$DB_PASS" \
+        -e S3_BUCKET="$S3_BUCKET" \
+        -e AWS_ACCESS_KEY_ID="$AWS_ACCESS_KEY_ID" \
+        -e AWS_SECRET_ACCESS_KEY="$AWS_SECRET_ACCESS_KEY" \
+        ghcr.io/fermionhq/mysql-backup-dump-to-s3:9828984731-1)
 
-        # Create the Docker container without starting it
-        CONTAINER_ID=$(docker create \
-            --name mariadb-backup \
-            -e DB_HOST="$DB_HOST" \
-            -e DB_PORT="$DB_PORT" \
-            -e DB_NAME="$DATABASE" \
-            -e DB_USER="$DB_USER" \
-            -e DB_PASS="$DB_PASS" \
-            -e S3_BUCKET="$S3_BUCKET" \
-            -e AWS_ACCESS_KEY_ID="$AWS_ACCESS_KEY_ID" \
-            -e AWS_SECRET_ACCESS_KEY="$AWS_SECRET_ACCESS_KEY" \
-            ghcr.io/fermionhq/mariadb-backup-dump-to-s3:7877541009-1)
+    # Connect the container to the "data-net" network
+    docker network connect data-net $CONTAINER_ID
 
-        # Connect the container to the "data-net" network
-        docker network connect data-net $CONTAINER_ID
+    # Connect the container to the "proxy" network
+    docker network connect proxy $CONTAINER_ID
 
-        # Connect the container to the "proxy" network
-        docker network connect proxy $CONTAINER_ID
+    # Start the container and wait for it to exit
+    docker start $CONTAINER_ID
+    docker wait $CONTAINER_ID
 
-        # Start the container and wait for it to exit
-        docker start $CONTAINER_ID
-        docker wait $CONTAINER_ID
+    # Stop and remove the container
+    docker stop $CONTAINER_ID
+    docker rm $CONTAINER_ID
 
-        # Stop and remove the container
-        docker stop $CONTAINER_ID
-        docker rm $CONTAINER_ID
-
-        # docker stop mariadb-backup
-        echo "finished script execution"
-    done
+    # docker stop mariadb-backup
+    echo "finished script execution"
 
 else
     echo "Error: .env file not found in the script directory"

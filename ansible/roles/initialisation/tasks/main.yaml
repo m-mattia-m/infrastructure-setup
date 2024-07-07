@@ -62,6 +62,13 @@
     state: present
     break_system_packages: true
 
+- name: Install mysql-cli via apt
+  ansible.builtin.apt:
+    name: mysql-client-core-8.0
+    state: present
+    update_cache: true
+  become: true
+
 ## This OpenVPN Access Server installation works fine but I have trouble with the ports.
 ## If I start OpenVPN it uses port 443 which is needed for traefik TLS routing (I don't want to change the default port.)
 #
