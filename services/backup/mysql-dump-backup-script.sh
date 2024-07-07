@@ -39,11 +39,11 @@ if [ -f "$SCRIPT_DIR/.env" ]; then
             -e AWS_SECRET_ACCESS_KEY="$AWS_SECRET_ACCESS_KEY" \
             ghcr.io/fermionhq/mariadb-backup-dump-to-s3:7877541009-1)
 
-        # Connect the container to the "server-deployment_local" network
-        docker network connect server-deployment_local $CONTAINER_ID
+        # Connect the container to the "data-net" network
+        docker network connect data-net $CONTAINER_ID
 
-        # Connect the container to the "server-deployment_public" network
-        docker network connect server-deployment_public $CONTAINER_ID
+        # Connect the container to the "proxy" network
+        docker network connect proxy $CONTAINER_ID
 
         # Start the container and wait for it to exit
         docker start $CONTAINER_ID
@@ -55,8 +55,7 @@ if [ -f "$SCRIPT_DIR/.env" ]; then
 
         # docker stop mariadb-backup
         echo "finished script execution"
-        exit 1
-        done
+    done
 
 else
     echo "Error: .env file not found in the script directory"
