@@ -4,7 +4,8 @@
 
 1. create a config file `cp config.env.dist config.env`
 2. change your config
-3. run `make new-node`
+3. update your `hosts.ini` in your `/ansible` directory
+4. run `make new-node`
 
 ## Replacements
 
