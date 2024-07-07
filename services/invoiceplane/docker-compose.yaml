@@ -1,0 +1,47 @@
+# https://github.com/mhzawadi/invoiceplane/blob/master/docker-compose.yml
+
+services:
+
+  invoiceplane:
+    hostname: invoiceplane
+    image: mhzawadi/invoiceplane:1.6.0
+    restart: unless-stopped
+    ports:
+      - "8992:80"
+    environment:
+        TZ: "Europe/Zurich"
+        MYSQL_HOST: "database"
+        MYSQL_DB: "invoiceplane"
+        MYSQL_USER: "invoiceplane"
+        MYSQL_PASSWORD: "${INVOICEPLANE_DB_PASSWORD}"
+        MYSQL_PORT: 3306
+        IP_URL: "${INVOICEPLANE_HOST}"
+        DISABLE_SETUP: false
+    networks:
+      - data-net
+      - proxy
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=proxy" # is to define which network should be used for traeffik (only needed if multiple networks are linked)
+      - "traefik.http.routers.invoiceplane-http.entrypoints=web" # 'web' could be 'http' if also in config file used
+      - "traefik.http.routers.invoiceplane-http.rule=Host(`{invoiceplane.fqdn}`)"
+      # - "traefik.http.middlewares.traefik-auth.basicauth.users=${TRAEFIK_DASHBOARD_CREDENTIALS}"
+      - "traefik.http.middlewares.invoiceplane-https-redirect.redirectscheme.scheme=https"
+      - "traefik.http.middlewares.sslheader.headers.customrequestheaders.X-Forwarded-Proto=https"
+      - "traefik.http.routers.invoiceplane-https.middlewares=invoiceplane-https-redirect"
+      - "traefik.http.routers.invoiceplane-https.entrypoints=websecure" # 'websecure' could be 'https' if also in config file used
+      - "traefik.http.routers.invoiceplane-https.rule=Host(`{invoiceplane.fqdn}`)"
+      # - "traefik.http.routers.invoiceplane-https.middlewares=traefik-auth"
+      - "traefik.http.routers.invoiceplane-https.tls=true"
+      - "traefik.http.routers.invoiceplane-https.tls.certresolver=infomaniak"
+      - "traefik.http.middlewares.invoiceplane-http.ipallowlist.sourcerange=${remote.host.ip.or.dyndns}"
+      - "traefik.http.middlewares.invoiceplane-https.ipallowlist.sourcerange=${remote.host.ip.or.dyndns}"
+      - "traefik.http.routers.invoiceplane-https.middlewares=invoiceplane-https@docker" # important to add the middleware to your router
+      - "traefik.http.routers.invoiceplane-http.middlewares=invoiceplane-http@docker" # important to add the middleware to your router
+
+networks:
+  data-net:
+    external: true
+  proxy:
+    external: true
+    internal: false

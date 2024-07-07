@@ -1,0 +1,21 @@
+---
+- name: Ensure the target file exists
+  ansible.builtin.stat:
+    path: "{{ target_file }}"
+  register: target_file_stat
+
+- name: Fail if the target file does not exist
+  ansible.builtin.fail:
+    msg: "The target file {{ target_file }} does not exist."
+  when: not target_file_stat.stat.exists
+
+- name: Convert array to space-separated string if necessary
+  ansible.builtin.set_fact:
+    formatted_replacement: >- # you can't seperate the jinja2-template on several lines otherwise it appears a lint-error
+      {%- if (replacement is iterable) and (replacement is not string) -%}{{ replacement | join(' ') }}{%- else -%}{{ replacement }}{%- endif %}
+
+- name: Replace placeholder with replacement in the target file
+  ansible.builtin.replace:
+    path: "{{ target_file }}"
+    regexp: "{{ placeholder | regex_escape }}"
+    replace: "{{ formatted_replacement }}"

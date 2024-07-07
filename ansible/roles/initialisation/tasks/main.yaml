@@ -1,0 +1,98 @@
+---
+# roles/initialisation/tasks/main.yml
+
+- name: Ensure the VM is reachable
+  ansible.builtin.ping:
+
+- name: Update and upgrade apt cache
+  ansible.builtin.apt:
+    update_cache: true
+    upgrade: true
+  become: true
+
+- name: Install gnome-terminal and curl via apt
+  ansible.builtin.apt:
+    name: gnome-terminal, curl
+    update_cache: true
+  become: true
+
+- name: Install git-all via apt
+  ansible.builtin.apt:
+    name: git-all
+    state: present
+    update_cache: true
+  become: true
+
+- name: Install make via apt
+  ansible.builtin.apt:
+    name: make
+    state: present
+    update_cache: true
+  become: true
+
+- name: Copy and execute docker installation script
+  become: true
+  ansible.builtin.script:
+    cmd: "{{ role_path }}/scripts/docker-installation.sh"
+
+- name: Install go via snap
+  ansible.builtin.apt:
+    name: golang-go
+    state: present
+  become: true
+
+- name: Install python-3-pip via apt
+  become: true
+  ansible.builtin.apt:
+    name: python3-pip
+    state: present
+    update_cache: true
+
+- name: Install python-3-pip via apt
+  become: true
+  ansible.builtin.apt:
+    name: python3-pip
+    state: present
+    update_cache: true
+
+- name: Install pymysql via pip and make sure pymysql is present
+  become: true
+  ansible.builtin.pip:
+    name: pymysql
+    state: present
+    break_system_packages: true
+
+- name: Install mysql-cli via apt
+  ansible.builtin.apt:
+    name: mysql-client-core-8.0
+    state: present
+    update_cache: true
+  become: true
+
+## This OpenVPN Access Server installation works fine but I have trouble with the ports.
+## If I start OpenVPN it uses port 443 which is needed for traefik TLS routing (I don't want to change the default port.)
+#
+# - name: Copy and execute open-vpn-server installation script
+#   vars:
+#     script_path: "{{ role_path }}/scripts/open-vpn-server-installation.sh"
+#     target_directory: "/home/{{ ansible_user }}/open-vpn-access-server-log.txt"
+#   ansible.builtin.include_tasks: ./run-script-pr¨¨int-logs/tasks/main.yaml
+
+# - name: Extract and print specific section from remote file
+#   ansible.builtin.include_tasks: ./print-to-localhost/tasks/main.yaml
+
+# reboot is required for correct docker installation
+- name: Reboot machine
+  become: true
+  ansible.builtin.reboot:
+    msg: "Rebooting machine in 5 seconds"
+    # post_reboot_delay: 5
+    connect_timeout: 300
+
+# unfortunally is the image for the backup solution in a private repostiory
+# and the S3-endpoint is hardhoded '--endpoint-url=https://sos-ch-dk-2.exo.io'
+- name: Log into ghcr.io
+  docker_login:
+    registry: ghcr.io
+    username: "{{ ghcr_username }}"
+    password: "{{ ghcr_password }}"

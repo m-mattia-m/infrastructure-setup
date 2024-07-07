@@ -1,0 +1,32 @@
+services:
+  database:
+    image: mysql:8.1
+    container_name: database
+    hostname: database
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:3306:3306"
+    networks:
+      - data-net
+      - proxy
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_CLUSTER_ROOT_PASSWORD}
+    volumes:
+      - database:/var/lib/mysql
+    labels:
+      - "docker-volume-backup.stop-during-backup=true"
+    command:
+      [
+        "--character-set-server=utf8mb4",
+        "--collation-server=utf8mb4_unicode_ci",
+      ]
+
+volumes:
+  database:
+
+networks:
+  data-net:
+    external: true
+  proxy:
+    external: true
+    internal: false

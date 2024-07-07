@@ -1,0 +1,10 @@
+{
+    // "ansible.path": "/opt/homebrew/bin/ansible", // /opt/homebrew/bin/python3
+    "ansible.python.interpreterPath": "/opt/homebrew/bin/python3",
+    // "ansible.ansible.path": "ansible",
+    "ansible.ansible.useFullyQualifiedCollectionNames": true,
+    "ansible.validation.lint.path": "ansible-lint",
+    "ansibleServer.trace.server": "verbose",
+    "ansible.validation.lint.enabled": true,
+    // "ansible.executionEnvironment.enabled": true,
+}

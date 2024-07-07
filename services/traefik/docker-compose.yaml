@@ -1,0 +1,48 @@
+services:
+  traefik:
+    image: traefik:v3.0
+    container_name: traefik
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    networks:
+      - proxy
+    ports:
+      - 80:80
+      - 443:443
+      - 8080:8080
+    environment:
+      # TRAEFIK_DASHBOARD_CREDENTIALS: ${TRAEFIK_DASHBOARD_CREDENTIALS}
+      INFOMANIAK_ACCESS_TOKEN: ${INFOMANIAK_ACCESS_TOKEN}
+    env_file: .env
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /etc/localtime:/etc/localtime:ro
+      - /home/${ANSIBLE_USER}/infrastructure/services/traefik/data/public/:/public
+      - /home/${ANSIBLE_USER}/infrastructure/services/traefik/data/traefik.yaml:/traefik.yaml:ro
+      - /home/${ANSIBLE_USER}/infrastructure/services/traefik/data/acme.json:/acme.json
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=proxy"
+      - "traefik.http.routers.traefik-http.entrypoints=web" # 'web' could be 'http' if also in config file used
+      - "traefik.http.routers.traefik-http.rule=Host(`traefik.{ansible.fqdn}`)"
+      # - "traefik.http.middlewares.traefik-auth.basicauth.users=${TRAEFIK_DASHBOARD_CREDENTIALS}"
+      - "traefik.http.middlewares.traefik-https-redirect.redirectscheme.scheme=https"
+      - "traefik.http.middlewares.sslheader.headers.customrequestheaders.X-Forwarded-Proto=https"
+      - "traefik.http.routers.traefik-https.middlewares=traefik-https-redirect"
+      - "traefik.http.routers.traefik-https.entrypoints=websecure" # 'websecure' could be 'https' if also in config file used
+      - "traefik.http.routers.traefik-https.rule=Host(`traefik.{ansible.fqdn}`)"
+      # - "traefik.http.routers.traefik-https.middlewares=traefik-auth"
+      - "traefik.http.routers.traefik-https.tls=true"
+      - "traefik.http.routers.traefik-https.tls.certresolver=infomaniak"
+      - "traefik.http.routers.traefik-https.tls.domains[0].main={ansible.fqdn}"
+      - "traefik.http.routers.traefik-https.tls.domains[0].sans=*.{ansible.fqdn}"
+      - "traefik.http.routers.traefik-https.service=api@internal"
+      - "traefik.http.middlewares.traefik-https.ipallowlist.sourcerange=${remote.host.ip.or.dyndns}"
+      - "traefik.http.middlewares.traefik-http.ipallowlist.sourcerange=${remote.host.ip.or.dyndns}"
+      - "traefik.http.routers.traefik-https.middlewares=traefik-https@docker" # important to add the middleware to your router
+      - "traefik.http.routers.traefik-http.middlewares=traefik-http@docker" # important to add the middleware to your router
+
+networks:
+  proxy:
+    external: true

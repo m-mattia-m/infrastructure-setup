@@ -1,0 +1,4 @@
+./ansible/hosts.ini
+./ansible/hosts.cfg
+**/.env
+config.env
