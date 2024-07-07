@@ -16,6 +16,7 @@ if [ -f "$SCRIPT_DIR/.env" ]; then
     DB_USER="root"
     DB_PASS=$(grep "^DB_CLUSTER_ROOT_PASSWORD=" "$SCRIPT_DIR/.env" | cut -d '=' -f2 | tr -d '"')
     S3_BUCKET=$(grep "^BACKUP_S3_BUCKET_NAME=" "$SCRIPT_DIR/.env" | cut -d '=' -f2 | tr -d '"')
+    S3_HOST=$(grep "^BACKUP_S3_HOST=" "$SCRIPT_DIR/.env" | cut -d '=' -f2 | tr -d '"')
     AWS_ACCESS_KEY_ID=$(grep "^BACKUP_S3_KEY_ID=" "$SCRIPT_DIR/.env" | cut -d '=' -f2 | tr -d '"')
     AWS_SECRET_ACCESS_KEY=$(grep "^BACKUP_S3_ACCESS_KEY=" "$SCRIPT_DIR/.env" | cut -d '=' -f2 | tr -d '"')
 
@@ -30,6 +31,7 @@ if [ -f "$SCRIPT_DIR/.env" ]; then
         -e DB_USER="$DB_USER" \
         -e DB_PASS="$DB_PASS" \
         -e S3_BUCKET="$S3_BUCKET" \
+        -e S3_HOST="$S3_HOST" \
         -e AWS_ACCESS_KEY_ID="$AWS_ACCESS_KEY_ID" \
         -e AWS_SECRET_ACCESS_KEY="$AWS_SECRET_ACCESS_KEY" \
         ghcr.io/fermionhq/mysql-backup-dump-to-s3:9828984731-1)
