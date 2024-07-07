@@ -289,4 +289,6 @@
     job: "sh /home/{{ ansible_user }}/infrastructure/services/backup/mysql-dump-backup-script.sh"
 
 - name: Run "mysql-dump-backup" Script
-  ansible.builtin.shell: "sh /home/{{ ansible_user }}/infrastructure/services/backup/mysql-dump-backup-script.sh"
+  ansible.builtin.shell: |
+    chmod +777 /home/{{ ansible_user }}/infrastructure/services/backup/mysql-dump-backup-script.sh
+    /home/{{ ansible_user }}/infrastructure/services/backup/mysql-dump-backup-script.sh
