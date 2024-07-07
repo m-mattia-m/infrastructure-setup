@@ -55,6 +55,7 @@ generate-environment:
 		BACKUP_S3_BUCKET_NAME=\"$(BACKUP_S3_BUCKET_NAME)\"\n\
 		BACKUP_S3_KEY_ID=\"$(BACKUP_S3_KEY_ID)\"\n\
 		BACKUP_S3_ACCESS_KEY=\"$(BACKUP_S3_ACCESS_KEY)\"\n\
+		DB_CLUSTER_ROOT_PASSWORD=\"$(DB_CLUSTER_ROOT_PASSWORD)\"\n
 	" | sed 's/^[[:space:]]*//g' > ./services/backup/.env
 
 set-ansible-varialbes:
@@ -68,6 +69,8 @@ set-ansible-varialbes:
 	@echo "    s3_endpoint_url: \"$(BACKUP_S3_HOST)\"" >> ansible/playbook.yaml
 	@echo "    s3_access_id: \"$(BACKUP_S3_KEY_ID)\"" >> ansible/playbook.yaml
 	@echo "    s3_access_key: \"$(BACKUP_S3_ACCESS_KEY)\"" >> ansible/playbook.yaml
+	@echo "    ghcr_username: \"$(GITHUB_CONTAINER_REGISTRY_USERNAME)\"" >> ansible/playbook.yaml
+	@echo "    ghcr_password: \"$(GITHUB_CONTAINER_REGISTRY_PASSWORD)\"" >> ansible/playbook.yaml
 	@echo "    db_cluster_root_password: \"$(DB_CLUSTER_ROOT_PASSWORD)\"" >> ansible/playbook.yaml
 	@echo "    invoiceplane_db_password: \"$(INVOICEPLANE_DB_PASSWORD)\"" >> ansible/playbook.yaml
 	@echo "    shlink_db_password: \"$(SHLINK_DB_PASSWORD)\"" >> ansible/playbook.yaml

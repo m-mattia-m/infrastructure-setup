@@ -275,7 +275,18 @@
   community.docker.docker_compose_v2:
     project_src: /home/{{ ansible_user }}/infrastructure/services/shlink
 
-- name: Start Backup
-  become: true
-  community.docker.docker_compose_v2:
-    project_src: /home/{{ ansible_user }}/infrastructure/services/backup
+# can't restore the data at the moment -> I will check it later
+# - name: Start Backup
+#   become: true
+#   community.docker.docker_compose_v2:
+#     project_src: /home/{{ ansible_user }}/infrastructure/services/backup
+
+- name: Create cron-job for mysql-dump backup every day at 3am
+  ansible.builtin.cron:
+    name: "backup mysql-cluster"
+    minute: "0"
+    hour: "3"
+    job: "sh /home/{{ ansible_user }}/infrastructure/services/backup/mysql-dump-backup-script.sh"
+
+- name: Run "mysql-dump-backup" Script
+  ansible.builtin.shell: "sh /home/{{ ansible_user }}/infrastructure/services/backup/mysql-dump-backup-script.sh"

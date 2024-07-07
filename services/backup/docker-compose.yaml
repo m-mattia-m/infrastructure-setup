@@ -1,6 +1,7 @@
 services:
   backup:
     image: jareware/docker-volume-backup
+    hostname: backup
     networks:
       - proxy
       - data-net
