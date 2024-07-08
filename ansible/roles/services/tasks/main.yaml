@@ -206,6 +206,7 @@
     name: shlink
     host: '%'
     state: absent
+    column_case_sensitive: false
   failed_when: false
 
 - name: Drop existing user 'invoiceplane'
@@ -218,6 +219,7 @@
     name: invoiceplane
     host: '%'
     state: absent
+    column_case_sensitive: false
   failed_when: false
 
 - name: Create database 'shlink'
@@ -229,6 +231,10 @@
     connect_timeout: 1200
     name: shlink
     state: present
+  register: create_db_shlink_result
+  retries: 3
+  delay: 10
+  until: create_db_shlink_result is not failed
 
 - name: Create database 'invoiceplane'
   ansible.builtin.mysql_db:
@@ -239,6 +245,10 @@
     connect_timeout: 1200
     name: invoiceplane
     state: present
+  register: create_db_invoice_result
+  retries: 3
+  delay: 10
+  until: create_db_invoice_result is not failed
 
 - name: Create MySQL user 'shlink'
   ansible.builtin.mysql_user:
@@ -252,6 +262,11 @@
     password: "{{ shlink_db_password }}"
     priv: '*.*:ALL'
     state: present
+    column_case_sensitive: false
+  register: create_user_shlink_result
+  retries: 3
+  delay: 10
+  until: create_user_shlink_result is not failed
 
 - name: Create MySQL user 'invoiceplane'
   ansible.builtin.mysql_user:
@@ -265,6 +280,11 @@
     password: "{{ invoiceplane_db_password }}"
     priv: '*.*:ALL'
     state: present
+    column_case_sensitive: false
+  register: create_user_invoiceplane_result
+  retries: 3
+  delay: 10
+  until: create_user_invoiceplane_result is not failed
 
 - name: Start traefik
   become: true
