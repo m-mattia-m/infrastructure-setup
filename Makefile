@@ -7,6 +7,7 @@ entrypoint:
 	@echo "- generate-environment"
 	@echo "- set-ansible-varialbes"
 	@echo "- new-node"
+	@echo "- new-node-sudo"
 # 	 @echo "- new-clean-node"
 # 	 @echo "- new-restored-node"
 # 	 @echo "     -> selects your latest backup"
@@ -100,6 +101,13 @@ new-node:
 	@echo "--------------------------------------------------"
 	$(MAKE) set-ansible-varialbes
 	ansible-playbook -i ./ansible/hosts.ini ./ansible/playbook.yaml --extra-vars "restore_backup=false"
+
+new-node-sudo:
+	@echo "--------------------------------------------------"
+	@echo "           Setup new node with ansible            "
+	@echo "--------------------------------------------------"
+	$(MAKE) set-ansible-varialbes
+	ansible-playbook -i ./ansible/hosts.ini ./ansible/playbook.yaml --extra-vars "restore_backup=false" -K
 
 ## these endpoints are in development and do not work at the moment
 # new-clean-node:

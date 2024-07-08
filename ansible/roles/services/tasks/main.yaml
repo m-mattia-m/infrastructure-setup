@@ -6,7 +6,7 @@
     repo: 'https://github.com/m-mattia-m/infrastructure-setup.git'
     dest: /home/{{ ansible_user }}/infrastructure
     clone: true
-    version: ansible
+    version: main
 
 - name: Update traefik acme.json permissions
   ansible.builtin.file:
@@ -140,6 +140,7 @@
     job: "sh /home/{{ ansible_user }}/infrastructure/services/dyndns-check/check-dyndns.sh"
 
 - name: Run "Check-DynDNS" Script
+  become: true
   ansible.builtin.shell: "sh /home/{{ ansible_user }}/infrastructure/services/dyndns-check/check-dyndns.sh"
 
 - name: Kill processes running on port 80
@@ -179,6 +180,7 @@
     login_port: 3306
     login_user: root
     login_password: "{{ db_cluster_root_password }}"
+    connect_timeout: 1200
     name: shlink
     state: absent
   failed_when: false
@@ -189,6 +191,7 @@
     login_port: 3306
     login_user: root
     login_password: "{{ db_cluster_root_password }}"
+    connect_timeout: 1200
     name: invoiceplane
     state: absent
   failed_when: false
@@ -199,6 +202,7 @@
     login_port: 3306
     login_user: root
     login_password: "{{ db_cluster_root_password }}"
+    connect_timeout: 1200
     name: shlink
     host: '%'
     state: absent
@@ -210,20 +214,30 @@
     login_port: 3306
     login_user: root
     login_password: "{{ db_cluster_root_password }}"
+    connect_timeout: 1200
     name: invoiceplane
     host: '%'
     state: absent
   failed_when: false
 
-- name: Create databases 'shlink' and 'invoiceplane'
+- name: Create database 'shlink'
   ansible.builtin.mysql_db:
     login_host: 127.0.0.1 # localhost -> unix-socket; 127.0.0.1 -> TCP
     login_port: 3306
     login_user: root
     login_password: "{{ db_cluster_root_password }}"
-    name:
-      - shlink
-      - invoiceplane
+    connect_timeout: 1200
+    name: shlink
+    state: present
+
+- name: Create database 'invoiceplane'
+  ansible.builtin.mysql_db:
+    login_host: 127.0.0.1 # localhost -> unix-socket; 127.0.0.1 -> TCP
+    login_port: 3306
+    login_user: root
+    login_password: "{{ db_cluster_root_password }}"
+    connect_timeout: 1200
+    name: invoiceplane
     state: present
 
 - name: Create MySQL user 'shlink'
@@ -232,6 +246,7 @@
     login_port: 3306
     login_user: root
     login_password: "{{ db_cluster_root_password }}"
+    connect_timeout: 1200
     name: shlink
     host: '%'
     password: "{{ shlink_db_password }}"
@@ -244,6 +259,7 @@
     login_port: 3306
     login_user: root
     login_password: "{{ db_cluster_root_password }}"
+    connect_timeout: 1200
     name: invoiceplane
     host: '%'
     password: "{{ invoiceplane_db_password }}"
@@ -289,6 +305,7 @@
     job: "sh /home/{{ ansible_user }}/infrastructure/services/backup/mysql-dump-backup-script.sh"
 
 - name: Run "mysql-dump-backup" Script
+  become: true
   ansible.builtin.shell: |
     chmod +777 /home/{{ ansible_user }}/infrastructure/services/backup/mysql-dump-backup-script.sh
     /home/{{ ansible_user }}/infrastructure/services/backup/mysql-dump-backup-script.sh

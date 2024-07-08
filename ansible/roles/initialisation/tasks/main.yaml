@@ -55,12 +55,16 @@
     state: present
     update_cache: true
 
-- name: Install pymysql via pip and make sure pymysql is present
+- name: Install pymysql via pip
   become: true
   ansible.builtin.pip:
     name: pymysql
     state: present
     break_system_packages: true
+
+- name: Install cryptography package via pip
+  ansible.builtin.pip:
+    name: cryptography
 
 - name: Install mysql-cli via apt
   ansible.builtin.apt:
@@ -90,7 +94,6 @@
     connect_timeout: 300
 
 # unfortunally is the image for the backup solution in a private repostiory
-# and the S3-endpoint is hardhoded '--endpoint-url=https://sos-ch-dk-2.exo.io'
 - name: Log into ghcr.io
   docker_login:
     registry: ghcr.io
