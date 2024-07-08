@@ -13,6 +13,7 @@ services:
       MYSQL_ROOT_PASSWORD: ${DB_CLUSTER_ROOT_PASSWORD}
     volumes:
       - database:/var/lib/mysql
+      - ./my.cnf:/etc/my.cnf
     labels:
       - "docker-volume-backup.stop-during-backup=true"
     command:
