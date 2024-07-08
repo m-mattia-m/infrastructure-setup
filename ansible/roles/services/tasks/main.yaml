@@ -317,6 +317,11 @@
 #   community.docker.docker_compose_v2:
 #     project_src: /home/{{ ansible_user }}/infrastructure/services/backup
 
+- name: Pull backup-image 'mysql-backup-dump-to-s3'
+  community.docker.docker_image:
+    name: ghcr.io/fermionhq/mysql-backup-dump-to-s3:9828984731-1
+    source: pull
+
 - name: Create cron-job for mysql-dump backup every day at 3am
   ansible.builtin.cron:
     name: "backup mysql-cluster"
