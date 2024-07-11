@@ -4,7 +4,7 @@ services:
 
   invoiceplane:
     hostname: invoiceplane
-    image: mhzawadi/invoiceplane:1.6.0
+    image: mhzawadi/invoiceplane:1.6.1.2
     restart: unless-stopped
     ports:
       - "8992:80"
