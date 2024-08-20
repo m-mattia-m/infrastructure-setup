@@ -1,0 +1,38 @@
+---
+
+- name: Run the pre setup tasks
+  ansible.builtin.include_role:
+    name: pre_setup_tasks
+
+- name: Copy the whole service directory to the remote
+  become: true
+  ansible.builtin.copy:
+    src: ../../../../services/invoiceplane/
+    dest: "/home/{{ ansible_user }}/infrastructure/services/invoiceplane/"
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: '0744'
+    directory_mode: '0744'
+
+- name: Create .env file for Invoiceplane
+  become: true
+  ansible.builtin.copy:
+    dest: "/home/{{ ansible_user }}/infrastructure/services/invoiceplane/.env"
+    content: |
+      INVOICEPLANE_HOST={{ invocieplane_host }}
+      INVOICEPLANE_DB_PASSWORD={{ invoiceplane_db_password }}
+      HOST_FQDN={{ invoiceplane_fqdn }}
+      SOURCE_RANGE={{ source_range }}
+    mode: '0744'
+
+- name: Setup database for invoiceplane
+  ansible.builtin.include_tasks: roles/shared/tasks/create-service-database-mysql/tasks/main.yaml
+  vars:
+    root_password: "{{ db_cluster_root_password }}"
+    service_db_name: "invoiceplane"
+    service_db_password: "invoiceplane"
+
+- name: Start invoiceplane
+  become: true
+  community.docker.docker_compose_v2:
+    project_src: /home/{{ ansible_user }}/infrastructure/services/invoiceplane

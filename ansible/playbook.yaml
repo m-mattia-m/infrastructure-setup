@@ -1,6 +1,96 @@
 ---
-- name: Manage all private nodes
-  hosts: private_hosts
-  roles:
-    - initialisation
-    - services
+- name: Setup a (/several) node(/s) and different application(s) on it
+  hosts: all
+  vars:
+    role_options:
+      1: initialisation
+      2: setup_databases
+      3: setup_invoiceplane
+      4: setup_portainer
+      5: setup_shlink
+      6: setup_traefik
+      7: setup_whoami
+      8: setup_paperless
+      9: setup_rclone
+  tasks:
+    - name: Display role options
+      ansible.builtin.debug:
+        msg:
+          - "Please select the roles you want to run by entering the corresponding numbers separated by spaces:"
+          - "1: Basic node setup"
+          - "2: Databases setup"
+          - "3: Invoiceplane setup"
+          - "4: Portainer setup"
+          - "5: Shlink setup"
+          - "6: Traefik setup"
+          - "7: Whoami setup"
+          - "8: Paperless-ngx setup"
+          - "9: rClone setup"
+
+    - name: Pause for input
+      ansible.builtin.pause:
+        prompt: "Enter your choices (e.g., 1 3 5):"
+      register: ansible_role_choice
+
+    - name: Set selected roles
+      ansible.builtin.set_fact:
+        selected_roles: "{{ ansible_role_choice.user_input.split() | map('int') | map('extract', role_options) | list }}"
+
+    - name: Include selected roles
+      ansible.builtin.include_role:
+        name: "{{ item }}"
+      # update your own variables
+      vars:
+        traefik_dashboard_credentials: "user:password"
+        infomaniak_access_token: "my-infomaniak-dns-token"
+        ca_server: "https://acme-staging-v02.api.letsencrypt.org/directory" # for testing
+        # ca_server: "https://acme-v02.api.letsencrypt.org/directory" # for production
+        allowed_dyn_dns_fqdn: "home.domain.com" # fqdn for dynDns
+
+        ghcr_username: "m-mattia-m"
+        ghcr_password: "my-gh-token"
+
+        s3_endpoint_url: "https://sos-ch-dk-2.exo.io"
+        s3_region: "ch-dk-2"
+        s3_bucket_name: "my-exo-s3-bucket"
+        s3_access_id: "EX1234"
+        s3_access_key: "my-exo-access-key"
+
+        db_cluster_root_password: "my-db-root-password"
+        invoiceplane_db_password: "my-invoiceplane-db-password"
+        shlink_db_password: "my-shlink-db-password"
+        paperless_db_password: "my-paperless-db-password"
+
+        shlink_ui_fqdn: "shlink.services.domain.com"
+        shlink_server_fqdn: "l.domain.com"
+        shlink_server_url: "https://l.domain.com"
+        shlink_geolite_license_key: "my-geolite-api-key"
+        shlink_initial_api_key: "my-initial-shlink-api-key"
+
+        invocieplane_host: "https://invoiceplane.services.domain.com"
+        invoiceplane_fqdn: "invoiceplane.services.domain.com"
+
+        portainer_base_url: "https://portainer.01.nodes.domain.com"
+
+        paperless_url: "https://paperless.domain.com"
+        paperless_fqdn: "paperless.domain.com"
+        paperless_admin_user: admin
+        paperless_admin_email: my@domain.com
+        paperless_admin_password: 'my-paperlass-init-password'
+
+        rclone_username: rclone
+        rclone_password: 'my-rclone-ui-password'
+        rclone_webdav_url: https://123456.connect.kdrive.infomaniak.com
+        rclone_webdav_username: my@domain.ch
+        rclone_webdav_password: my-infomaniak-kdrive-access-token
+        rclone_webdav_originals_dir: /your/kdrive/archive/path
+        rclone_webdav_input_dir: /your/input/path
+
+        allow_list_files_to_update:
+          - "/home/{{ ansible_user }}/infrastructure/services/whoami/docker-compose.yaml"
+          - "/home/{{ ansible_user }}/infrastructure/services/shlink/docker-compose.yaml"
+          - "/home/{{ ansible_user }}/infrastructure/services/portainer/docker-compose.yaml"
+          - "/home/{{ ansible_user }}/infrastructure/services/invoiceplane/docker-compose.yaml"
+          - "/home/{{ ansible_user }}/infrastructure/services/traefik/docker-compose.yaml"
+          - "/home/{{ ansible_user }}/infrastructure/services/paperless/docker-compose.yaml"
+      loop: "{{ selected_roles }}"

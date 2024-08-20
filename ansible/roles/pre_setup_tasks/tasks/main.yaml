@@ -1,0 +1,57 @@
+---
+
+# - name: Check if the role has already run
+#   ansible.builtin.stat:
+#     path: "/home/{{ ansible_user }}/flagfile"
+#   register: role_run_flag
+# 
+# - name: Create flag file to mark role as run
+#   become: true
+#   ansible.builtin.copy:
+#     dest: "/home/{{ ansible_user }}/flagfile"
+#     owner: "{{ ansible_user }}"
+#     group: "{{ ansible_user }}"
+#     mode: '0744'
+#     content: |
+#       This file indicates that pre tasks have been run. You can delete it to run them again.
+#   when: not role_run_flag.stat.exists
+
+- name: Create docker proxy network
+  become: true
+  ansible.builtin.docker_network:
+    name: proxy
+  # when: not role_run_flag.stat.exists
+
+- name: Create docker data-net network
+  become: true
+  ansible.builtin.docker_network:
+    name: data-net
+    internal: true
+  # when: not role_run_flag.stat.exists
+
+- name: Creates 'infrastrucutre' directory if it does not exist
+  become: true
+  ansible.builtin.file:
+    path: "/home/{{ ansible_user }}/infrastructure"
+    state: directory
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: '0744'
+
+- name: Create ip-archive.txt file
+  become: true
+  ansible.builtin.copy:
+    dest: "/home/{{ ansible_user }}/infrastructure/ip-archive.txt"
+    content: |
+      127.0.0.1
+    mode: '0744'
+
+- name: Read dynDNS IPv4 address
+  become: true
+  ansible.builtin.slurp:
+    src: "/home/{{ ansible_user }}/infrastructure/ip-archive.txt"
+  register: source_range_file_value
+
+- name: Decode the Base64 content and register it
+  ansible.builtin.set_fact:
+    source_range: "{{ source_range_file_value.content | b64decode }}"

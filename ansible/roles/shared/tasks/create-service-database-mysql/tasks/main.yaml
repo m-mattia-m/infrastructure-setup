@@ -1,0 +1,57 @@
+---
+
+- name: Drop existing database '{{ service_db_name }}'
+  ansible.builtin.mysql_db:
+    login_host: 127.0.0.1 # localhost -> unix-socket; 127.0.0.1 -> TCP
+    login_port: 3306
+    login_user: root
+    login_password: "{{ root_password }}"
+    connect_timeout: 1200
+    name: "{{ service_db_name }}"
+    state: absent
+  failed_when: false
+
+- name: Drop existing user '{{ service_db_name }}'
+  ansible.builtin.mysql_user:
+    login_host: 127.0.0.1 # localhost -> unix-socket; 127.0.0.1 -> TCP
+    login_port: 3306
+    login_user: root
+    login_password: "{{ root_password }}"
+    connect_timeout: 1200
+    name: "{{ service_db_name }}"
+    host: '%'
+    state: absent
+    column_case_sensitive: false
+  failed_when: false
+
+- name: Create database '{{ service_db_name }}'
+  ansible.builtin.mysql_db:
+    login_host: 127.0.0.1 # localhost -> unix-socket; 127.0.0.1 -> TCP
+    login_port: 3306
+    login_user: root
+    login_password: "{{ root_password }}"
+    connect_timeout: 1200
+    name: "{{ service_db_name }}"
+    state: present
+  register: create_db_result
+  retries: 3
+  delay: 10
+  until: create_db_result is not failed
+
+- name: Create MySQL user '{{ service_db_name }}'
+  ansible.builtin.mysql_user:
+    login_host: 127.0.0.1 # localhost -> unix-socket; 127.0.0.1 -> TCP
+    login_port: 3306
+    login_user: root
+    login_password: "{{ root_password }}"
+    connect_timeout: 1200
+    name: "{{ service_db_name }}"
+    host: '%'
+    password: "{{ service_db_password }}"
+    priv: '*.*:ALL'
+    state: present
+    column_case_sensitive: false
+  register: create_user_result
+  retries: 3
+  delay: 10
+  until: create_user_result is not failed

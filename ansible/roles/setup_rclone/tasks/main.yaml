@@ -1,0 +1,84 @@
+---
+
+- name: Run the pre setup tasks
+  ansible.builtin.include_role:
+    name: pre_setup_tasks
+
+- name: Copy the whole service directory to the remote
+  become: true
+  ansible.builtin.copy:
+    src: ../../../../services/rclone/
+    dest: "/home/{{ ansible_user }}/infrastructure/services/rclone/"
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: '0744'
+    directory_mode: '0744'
+
+- name: Create .env file for rClone
+  become: true
+  ansible.builtin.copy:
+    dest: "/home/{{ ansible_user }}/infrastructure/services/rclone/.env"
+    content: |
+      ANSIBLE_HOST_FQDN={{ fqdn }}
+      SOURCE_RANGE={{ source_range }}
+      ANSIBLE_USER={{ ansible_user }}
+      RCLONE_USERNAME={{ rclone_username }}
+      RCLONE_PASSWORD={{ rclone_password }}
+    mode: '0744'
+
+- name: Create config file for rClone
+  become: true
+  ansible.builtin.copy:
+    dest: "/home/{{ ansible_user }}/infrastructure/services/rclone/config/rclone.conf"
+    content: |
+      [local]
+      type = local
+      nounc = true
+
+      [kDrive]
+      type = webdav
+      url = {{ rclone_webdav_url }}
+      vendor = other
+      user = {{ rclone_webdav_username }}
+      pass = {{ rclone_webdav_password }}
+    mode: '0744'
+
+- name: Start rClone
+  become: true
+  community.docker.docker_compose_v2:
+    project_src: /home/{{ ansible_user }}/infrastructure/services/rclone
+
+- name: Copy rClone config to default config directory
+  ansible.builtin.copy:
+    src: "/home/{{ ansible_user }}/infrastructure/services/rclone/config/rclone.conf"
+    dest: "/home/{{ ansible_user }}/.config/rclone/"
+    remote_src: true
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: '0744'
+
+- name: Run rclone sync for originals
+  ansible.builtin.command: >
+    rclone bisync /home/{{ ansible_user }}/infrastructure/services/paperless/media/originals kDrive:{{ rclone_webdav_originals_dir }} --create-empty-src-dirs --resync --checksum
+  register: redis_create_user
+  ignore_errors: true
+
+- name: Run rclone sync for consumption
+  ansible.builtin.command: >
+    rclone bisync /home/{{ ansible_user }}/infrastructure/services/paperless/consume kDrive:{{ rclone_webdav_input_dir }} --create-empty-src-dirs --resync --checksum
+  register: redis_create_user
+  ignore_errors: true
+
+- name: Create cron-job for rclone-sync 'originals' every second minute
+  ansible.builtin.cron:
+    name: "resync rclone - kdrive-originals-sync"
+    minute: "*/2"
+    hour: "*"
+    job: "rclone bisync /home/{{ ansible_user }}/infrastructure/services/paperless/media/originals kDrive:{{ rclone_webdav_originals_dir }} --create-empty-src-dirs --resync --checksum"
+
+- name: Create cron-job for rclone-sync 'consumption' every second minute
+  ansible.builtin.cron:
+    name: "resync rclone - kdrive-consumption-sync"
+    minute: "*/2"
+    hour: "*"
+    job: "rclone bisync /home/{{ ansible_user }}/infrastructure/services/paperless/consume kDrive:{{ rclone_webdav_input_dir }} --create-empty-src-dirs --resync --checksum"

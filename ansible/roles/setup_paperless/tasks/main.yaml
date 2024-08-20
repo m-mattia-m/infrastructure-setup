@@ -1,0 +1,48 @@
+---
+
+- name: Run the pre setup tasks
+  ansible.builtin.include_role:
+    name: pre_setup_tasks
+
+- name: Copy the whole service directory to the remote
+  become: true
+  ansible.builtin.copy:
+    src: ../../../../services/paperless/
+    dest: "/home/{{ ansible_user }}/infrastructure/services/paperless/"
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: '0744'
+    directory_mode: '0744'
+
+- name: Create .env file for Paperless
+  become: true
+  ansible.builtin.copy:
+    dest: "/home/{{ ansible_user }}/infrastructure/services/paperless/.env"
+    content: |
+      PAPERLESS_DB_PASSWORD={{ paperless_db_password }}
+      PAPERLESS_URL={{ paperless_url }}
+      PAPERLESS_ADMIN_USER={{ paperless_admin_user }}
+      PAPERLESS_ADMIN_EMAIL={{ paperless_admin_email }}
+      PAPERLESS_ADMIN_PASSWORD={{ paperless_admin_password }}
+      HOST_FQDN={{ paperless_fqdn }}
+      SOURCE_RANGE={{ source_range }}
+    mode: '0744'
+
+- name: Setup Postgres database for paperless
+  ansible.builtin.include_tasks: roles/shared/tasks/create-service-database-postgres/tasks/main.yaml
+  vars:
+    root_password: "{{ db_cluster_root_password }}"
+    service_db_name: "paperless"
+    service_db_password: "{{ paperless_db_password }}"
+
+- name: Setup Redis database for paperless
+  ansible.builtin.include_tasks: roles/shared/tasks/create-service-database-redis/tasks/main.yaml
+  vars:
+    root_password: "{{ db_cluster_root_password }}"
+    service_db_name: "paperless"
+    service_db_password: "{{ paperless_db_password }}"
+
+- name: Start paperless
+  become: true
+  community.docker.docker_compose_v2:
+    project_src: /home/{{ ansible_user }}/infrastructure/services/paperless

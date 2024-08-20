@@ -30,6 +30,39 @@
     update_cache: true
   become: true
 
+- name: Install redis-tools via apt
+  ansible.builtin.apt:
+    name: redis-tools
+    state: present
+    update_cache: true
+  become: true
+
+- name: Install postgresql-client via apt
+  ansible.builtin.apt:
+    name: postgresql-client
+    state: present
+    update_cache: true
+  become: true
+
+- name: Copy and execute rclone installation script
+  become: true
+  ansible.builtin.script:
+    cmd: "{{ role_path }}/scripts/rclone-installation.sh"
+
+- name: Install libpq-dev via apt
+  ansible.builtin.apt:
+    name: libpq-dev
+    state: present
+    update_cache: true
+  become: true
+
+- name: Install python3-psycopg2 via apt
+  ansible.builtin.apt:
+    name: python3-psycopg2
+    state: present
+    update_cache: true
+  become: true
+
 - name: Copy and execute docker installation script
   become: true
   ansible.builtin.script:
@@ -40,13 +73,6 @@
     name: golang-go
     state: present
   become: true
-
-- name: Install python-3-pip via apt
-  become: true
-  ansible.builtin.apt:
-    name: python3-pip
-    state: present
-    update_cache: true
 
 - name: Install python-3-pip via apt
   become: true
@@ -77,15 +103,43 @@
 
 ## This OpenVPN Access Server installation works fine but I have trouble with the ports.
 ## If I start OpenVPN it uses port 443 which is needed for traefik TLS routing (I don't want to change the default port.)
+# - name: Execute open-vpn-server installation script
+#   become: true
+#   ansible.builtin.script: "{{ role_path }}/scripts/open-vpn-server-installation.sh"
+#   register: command_output
 #
-# - name: Copy and execute open-vpn-server installation script
-#   vars:
-#     script_path: "{{ role_path }}/scripts/open-vpn-server-installation.sh"
-#     target_directory: "/home/{{ ansible_user }}/open-vpn-access-server-log.txt"
-#   ansible.builtin.include_tasks: ./run-script-pr¨¨int-logs/tasks/main.yaml
-
-# - name: Extract and print specific section from remote file
-#   ansible.builtin.include_tasks: ./print-to-localhost/tasks/main.yaml
+# - name: Save Logs in file
+#   become: true
+#   ansible.builtin.copy:
+#     dest: "/home/{{ ansible_user }}/open-vpn-access-server-log.txt"
+#     content: "{{ command_output.stdout }}"
+#     owner: "{{ ansible_user }}"
+#     group: "{{ ansible_user }}"
+#     mode: '0744'
+#   when: command_output.stdout is defined
+#
+## This print should work but it is not fully tested.
+# - name: Read file content
+#   ansible.builtin.slurp:
+#     src: open-vpn-access-server-log.txt
+#   register: file_content
+#
+# - name: Extract content between markers
+#   ansible.builtin.set_fact:
+#     filtered_lines: >-
+#       {% set start_marker = '+++++++++++++++++++++++++++++++++++++++++++++++' %}
+#       {% set end_marker = '+++++++++++++++++++++++++++++++++++++++++++++++' %}
+#
+#       {% set start_index = file_content.content | b64decode | string | regex_search(start_marker + '(.*)' + end_marker) %}
+#       {% if start_index %}
+#       {{ start_index.group(1).strip() }}
+#       {% else %}
+#       Content between markers not found!
+#       {% endif %}
+#
+# - name: Debug output
+#   ansible.builtin.debug:
+#     msg: "{{ filtered_lines.stdout }}"
 
 # reboot is required for correct docker installation
 - name: Reboot machine
@@ -97,7 +151,43 @@
 
 # unfortunally is the image for the backup solution in a private repostiory
 - name: Log into ghcr.io
-  docker_login:
+  ansible.builtin.docker_login:
     registry: ghcr.io
     username: "{{ ghcr_username }}"
     password: "{{ ghcr_password }}"
+
+# https://www.tecmint.com/change-apache-port-in-linux/
+- name: Call 'Apache2 port 80 - port conf' replacement tasks
+  ansible.builtin.include_tasks: roles/shared/tasks/replace-in-file/tasks/main.yaml
+  args:
+    apply:
+      become: true
+  vars:
+    target_file: "/etc/apache2/ports.conf"
+    placeholder: "80"
+    replacement: "8979"
+
+- name: Call 'Apache2 port 80 - default conf' replacement tasks
+  ansible.builtin.include_tasks: roles/shared/tasks/replace-in-file/tasks/main.yaml
+  args:
+    apply:
+      become: true
+  vars:
+    target_file: "/etc/apache2/sites-enabled/000-default.conf"
+    placeholder: "80"
+    replacement: "8979"
+
+- name: Call 'Apache2 port 443 - port conf' replacement tasks
+  ansible.builtin.include_tasks: roles/shared/tasks/replace-in-file/tasks/main.yaml
+  args:
+    apply:
+      become: true
+  vars:
+    target_file: "/etc/apache2/ports.conf"
+    placeholder: "443"
+    replacement: "444"
+
+- name: Kill processes running on port 80
+  ansible.builtin.include_tasks: roles/shared/tasks/kill-process/tasks/main.yaml
+  vars:
+    port_to_kill: 80

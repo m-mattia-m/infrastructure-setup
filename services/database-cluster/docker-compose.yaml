@@ -1,8 +1,8 @@
 services:
-  database:
+  mysql:
     image: mysql:8.1
-    container_name: database
-    hostname: database
+    container_name: mysql-database
+    hostname: mysql-database
     restart: unless-stopped
     ports:
       - "127.0.0.1:3306:3306"
@@ -12,7 +12,7 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: ${DB_CLUSTER_ROOT_PASSWORD}
     volumes:
-      - database:/var/lib/mysql
+      - mysql_database:/var/lib/mysql
       - ./my.cnf:/etc/my.cnf
     labels:
       - "docker-volume-backup.stop-during-backup=true"
@@ -23,8 +23,45 @@ services:
         "--default-authentication-plugin=caching_sha2_password",
       ]
 
+  redis:
+    image: redis:7.4.0
+    container_name: redis-database
+    hostname: redis-database
+    restart: unless-stopped
+    networks:
+      - data-net
+      - proxy
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_database:/root/redis
+    environment:
+      REDIS_PASSWORD: ${DB_CLUSTER_ROOT_PASSWORD}
+      REDIS_PORT: 6379
+    labels:
+      - "docker-volume-backup.stop-during-backup=true"
+
+  postgres:
+    image: postgres:14.13
+    container_name: postgres-database
+    hostname: postgres-database
+    restart: unless-stopped
+    networks:
+      - data-net
+      - proxy
+    ports:
+      - 5432:5432
+    volumes:
+      - postgres_database:/var/lib/postgresql/data
+    environment:
+      POSTGRES_PASSWORD: ${DB_CLUSTER_ROOT_PASSWORD}
+    labels:
+      - "docker-volume-backup.stop-during-backup=true"
+
 volumes:
-  database:
+  mysql_database:
+  redis_database:
+  postgres_database:
 
 networks:
   data-net:

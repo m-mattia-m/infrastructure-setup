@@ -25,21 +25,21 @@ services:
       - "traefik.enable=true"
       - "traefik.docker.network=proxy"
       - "traefik.http.routers.traefik-http.entrypoints=web" # 'web' could be 'http' if also in config file used
-      - "traefik.http.routers.traefik-http.rule=Host(`traefik.{ansible.fqdn}`)"
+      - "traefik.http.routers.traefik-http.rule=Host(`traefik.${ANSIBLE_HOST_FQDN}`)"
       # - "traefik.http.middlewares.traefik-auth.basicauth.users=${TRAEFIK_DASHBOARD_CREDENTIALS}"
       - "traefik.http.middlewares.traefik-https-redirect.redirectscheme.scheme=https"
       - "traefik.http.middlewares.sslheader.headers.customrequestheaders.X-Forwarded-Proto=https"
       - "traefik.http.routers.traefik-https.middlewares=traefik-https-redirect"
       - "traefik.http.routers.traefik-https.entrypoints=websecure" # 'websecure' could be 'https' if also in config file used
-      - "traefik.http.routers.traefik-https.rule=Host(`traefik.{ansible.fqdn}`)"
+      - "traefik.http.routers.traefik-https.rule=Host(`traefik.${ANSIBLE_HOST_FQDN}`)"
       # - "traefik.http.routers.traefik-https.middlewares=traefik-auth"
       - "traefik.http.routers.traefik-https.tls=true"
       - "traefik.http.routers.traefik-https.tls.certresolver=infomaniak"
-      - "traefik.http.routers.traefik-https.tls.domains[0].main={ansible.fqdn}"
-      - "traefik.http.routers.traefik-https.tls.domains[0].sans=*.{ansible.fqdn}"
+      - "traefik.http.routers.traefik-https.tls.domains[0].main=${ANSIBLE_HOST_FQDN}"
+      - "traefik.http.routers.traefik-https.tls.domains[0].sans=*.${ANSIBLE_HOST_FQDN}"
       - "traefik.http.routers.traefik-https.service=api@internal"
-      - "traefik.http.middlewares.traefik-https.ipallowlist.sourcerange=${remote.host.ip.or.dyndns}"
-      - "traefik.http.middlewares.traefik-http.ipallowlist.sourcerange=${remote.host.ip.or.dyndns}"
+      - "traefik.http.middlewares.traefik-https.ipallowlist.sourcerange=${SOURCE_RANGE}"
+      - "traefik.http.middlewares.traefik-http.ipallowlist.sourcerange=${SOURCE_RANGE}"
       - "traefik.http.routers.traefik-https.middlewares=traefik-https@docker" # important to add the middleware to your router
       - "traefik.http.routers.traefik-http.middlewares=traefik-http@docker" # important to add the middleware to your router
 

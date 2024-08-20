@@ -9,16 +9,16 @@ services:
       - "traefik.enable=true"
       - "traefik.docker.network=proxy"
       - "traefik.http.routers.whoami-http.entrypoints=web" # 'web' could be 'http' if also in config file used
-      - "traefik.http.routers.whoami-http.rule=Host(`whoami.{ansible.fqdn}`)"
+      - "traefik.http.routers.whoami-http.rule=Host(`whoami.${ANSIBLE_HOST_FQDN}`)"
       - "traefik.http.middlewares.whoami-https-redirect.redirectscheme.scheme=https"
       - "traefik.http.middlewares.sslheader.headers.customrequestheaders.X-Forwarded-Proto=https"
       - "traefik.http.routers.whoami-https.middlewares=whoami-https-redirect"
       - "traefik.http.routers.whoami-https.entrypoints=websecure" # 'websecure' could be 'https' if also in config file used
-      - "traefik.http.routers.whoami-https.rule=Host(`whoami.{ansible.fqdn}`)"
+      - "traefik.http.routers.whoami-https.rule=Host(`whoami.${ANSIBLE_HOST_FQDN}`)"
       - "traefik.http.routers.whoami-https.tls=true"
       - "traefik.http.routers.whoami-https.tls.certresolver=infomaniak"
-      - "traefik.http.middlewares.whoami-https.ipallowlist.sourcerange=${remote.host.ip.or.dyndns}"
-      - "traefik.http.middlewares.whoami-http.ipallowlist.sourcerange=${remote.host.ip.or.dyndns}"
+      - "traefik.http.middlewares.whoami-https.ipallowlist.sourcerange=${SOURCE_RANGE}"
+      - "traefik.http.middlewares.whoami-http.ipallowlist.sourcerange=${SOURCE_RANGE}"
       - "traefik.http.routers.whoami-https.middlewares=whoami-https@docker" # important to add the middleware to your router
       - "traefik.http.routers.whoami-http.middlewares=whoami-http@docker" # important to add the middleware to your router
 

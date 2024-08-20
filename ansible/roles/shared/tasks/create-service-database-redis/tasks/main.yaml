@@ -1,0 +1,21 @@
+---
+
+- name: Create a privileged user in Redis using redis-cli
+  ansible.builtin.command: >
+    redis-cli -u redis://default:{{ root_password }}@127.0.0.1:6379 ACL SETUSER {{ service_db_name }} on >{{ service_db_password }} +@all ~*
+  register: redis_create_user
+
+- name: Save this new file permanently and not only in-memory
+  ansible.builtin.command: >
+    redis-cli -u redis://default:{{ root_password }}@127.0.0.1:6379 ACL SAVE
+  register: redis_save_user
+
+- name: Verify the user creation
+  ansible.builtin.command: >
+    redis-cli -u redis://{{ service_db_name }}:{{ service_db_password }}@127.0.0.1:6379 ACL WHOAMI
+  register: redis_user
+  changed_when: false
+
+- name: Print success message for redis user creation
+  ansible.builtin.debug:
+    msg: "The Redis user {{ redis_user.stdout }} has been successfully created with the given privileges."

@@ -1,0 +1,82 @@
+services:
+  paperless:
+    hostname: paperless
+    image: ghcr.io/paperless-ngx/paperless-ngx:2.11.4
+    restart: unless-stopped
+    depends_on:
+      - gotenberg
+      - tika
+    networks:
+      - data-net
+      - proxy
+    ports:
+      - "8993:8000"
+    volumes:
+      - data:/usr/src/paperless/data
+      - ./media:/usr/src/paperless/media
+      - ./export:/usr/src/paperless/export
+      - ./consume:/usr/src/paperless/consume
+    environment:
+      PAPERLESS_TIME_ZONE: Europe/Zurich
+      PAPERLESS_OCR_LANGUAGE: deu
+      PAPERLESS_REDIS: redis://paperless:${PAPERLESS_DB_PASSWORD}@redis-database:6379/0
+      PAPERLESS_DBENGINE: postgresql
+      PAPERLESS_DBHOST: postgres-database
+      PAPERLESS_DBPORT: 5432
+      PAPERLESS_DBNAME: paperless
+      PAPERLESS_DBUSER: paperless
+      PAPERLESS_DBPASS: ${PAPERLESS_DB_PASSWORD}
+      PAPERLESS_TIKA_ENABLED: true
+      PAPERLESS_TIKA_GOTENBERG_ENDPOINT: http://gotenberg:3000
+      PAPERLESS_TIKA_ENDPOINT: http://tika:9998
+      PAPERLESS_FILENAME_FORMAT: "{created_year}-{created_month}-{created_day}_{correspondent}_{title}"
+      PAPERLESS_CONSUMER_POLLING: 86400 # analyze the document only every 24h for less resources usage
+      PAPERLESS_URL: ${PAPERLESS_URL}
+      PAPERLESS_ADMIN_USER: ${PAPERLESS_ADMIN_USER}
+      PAPERLESS_ADMIN_EMAIL: ${PAPERLESS_ADMIN_EMAIL}
+      PAPERLESS_ADMIN_PASSWORD: ${PAPERLESS_ADMIN_PASSWORD}
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=proxy" # is to define which network should be used for traeffik (only needed if multiple networks are linked)
+      - "traefik.http.routers.paperless-http.entrypoints=web" # 'web' could be 'http' if also in config file used
+      - "traefik.http.routers.paperless-http.rule=Host(`${HOST_FQDN}`)"
+      # - "traefik.http.middlewares.traefik-auth.basicauth.users=${TRAEFIK_DASHBOARD_CREDENTIALS}"
+      - "traefik.http.middlewares.paperless-https-redirect.redirectscheme.scheme=https"
+      - "traefik.http.middlewares.sslheader.headers.customrequestheaders.X-Forwarded-Proto=https"
+      - "traefik.http.routers.paperless-https.middlewares=paperless-https-redirect"
+      - "traefik.http.routers.paperless-https.entrypoints=websecure" # 'websecure' could be 'https' if also in config file used
+      - "traefik.http.routers.paperless-https.rule=Host(`${HOST_FQDN}`)"
+      # - "traefik.http.routers.paperless-https.middlewares=traefik-auth"
+      - "traefik.http.routers.paperless-https.tls=true"
+      - "traefik.http.routers.paperless-https.tls.certresolver=infomaniak"
+      - "traefik.http.middlewares.paperless-http.ipallowlist.sourcerange=${SOURCE_RANGE}"
+      - "traefik.http.middlewares.paperless-https.ipallowlist.sourcerange=${SOURCE_RANGE}"
+      - "traefik.http.routers.paperless-https.middlewares=paperless-https@docker" # important to add the middleware to your router
+      - "traefik.http.routers.paperless-http.middlewares=paperless-http@docker" # important to add the middleware to your router
+
+
+  gotenberg:
+    image: docker.io/gotenberg/gotenberg:8.7
+    restart: unless-stopped
+    networks:
+      - data-net
+    command:
+      - "gotenberg"
+      - "--chromium-disable-javascript=true"
+      - "--chromium-allow-list=file:///tmp/.*"
+
+  tika:
+    image: docker.io/apache/tika:2.9.2.1
+    networks:
+      - data-net
+    restart: unless-stopped
+
+volumes:
+  data:
+
+networks:
+  data-net:
+    external: true
+  proxy:
+    external: true
+    internal: false

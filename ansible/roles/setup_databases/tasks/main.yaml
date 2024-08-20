@@ -1,0 +1,35 @@
+---
+
+- name: Run the pre setup tasks
+  ansible.builtin.include_role:
+    name: pre_setup_tasks
+
+- name: Copy the whole service directory to the remote
+  become: true
+  ansible.builtin.copy:
+    src: ../../../../services/database-cluster/
+    dest: "/home/{{ ansible_user }}/infrastructure/services/database-cluster/"
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: '0744'
+    directory_mode: '0744'
+
+- name: Create .env file for Database
+  become: true
+  ansible.builtin.copy:
+    dest: "/home/{{ ansible_user }}/infrastructure/services/database-cluster/.env"
+    content: |
+      DB_CLUSTER_ROOT_PASSWORD={{ db_cluster_root_password }}
+    mode: '0744'
+
+- name: Start DB clusters
+  become: true
+  community.docker.docker_compose_v2:
+    project_src: /home/{{ ansible_user }}/infrastructure/services/database-cluster
+
+- name: Wait until DB is ready
+  ansible.builtin.wait_for:
+    host: 127.0.0.1
+    port: 3306
+    delay: 10
+    timeout: 50

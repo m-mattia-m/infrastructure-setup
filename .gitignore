@@ -1,4 +1,5 @@
 ./ansible/hosts.ini
 ./ansible/hosts.cfg
 **/.env
+**/.DS_Store
 config.env

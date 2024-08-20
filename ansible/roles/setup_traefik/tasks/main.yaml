@@ -1,0 +1,82 @@
+---
+
+- name: Run the pre setup tasks
+  ansible.builtin.include_role:
+    name: pre_setup_tasks
+
+- name: Copy the whole service directory to the remote
+  become: true
+  ansible.builtin.copy:
+    src: ../../../../services/traefik/
+    dest: "/home/{{ ansible_user }}/infrastructure/services/traefik/"
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: '0744'
+    directory_mode: '0744'
+
+- name: Copy the whole service directory to the remote
+  become: true
+  ansible.builtin.copy:
+    src: ../../../../services/dyndns-check/
+    dest: "/home/{{ ansible_user }}/infrastructure/services/dyndns-check/"
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: '0744'
+    directory_mode: '0744'
+
+- name: Create .env file for Traefik
+  become: true
+  ansible.builtin.copy:
+    dest: "/home/{{ ansible_user }}/infrastructure/services/traefik/.env"
+    content: |
+      TRAEFIK_DASHBOARD_CREDENTIALS={{ traefik_dashboard_credentials }}
+      INFOMANIAK_ACCESS_TOKEN={{ infomaniak_access_token }}
+      ANSIBLE_HOST_FQDN={{ fqdn }}
+      ANSIBLE_USER={{ ansible_user }}
+      SOURCE_RANGE={{ source_range }}
+    mode: '0744'
+
+- name: Call 'caServer' replacement tasks
+  ansible.builtin.include_tasks: roles/shared/tasks/replace-in-directory/tasks/main.yaml
+  vars:
+    target_directory: /home/{{ ansible_user }}/infrastructure/services
+    placeholder: "${caServer}"
+    replacement: "{{ ca_server }}"
+
+- name: Call 'AllowList - DynDNS script' replacement tasks
+  ansible.builtin.include_tasks: roles/shared/tasks/replace-in-directory/tasks/main.yaml
+  vars:
+    target_directory: "/home/{{ ansible_user }}/infrastructure/services"
+    placeholder: "replace:home.dyn.dns"
+    replacement: "{{ allowed_dyn_dns_fqdn }}"
+
+- name: Call 'AllowList - files to update' replacement tasks
+  ansible.builtin.include_tasks: roles/shared/tasks/replace-in-directory/tasks/main.yaml
+  vars:
+    target_directory: "/home/{{ ansible_user }}/infrastructure/services"
+    placeholder: "replace.files.to.update"
+    replacement: "{{ allow_list_files_to_update }}"
+
+- name: Create cron-job for dynDNS-check every day at 2am
+  ansible.builtin.cron:
+    name: "refresh dynDNS"
+    minute: "0"
+    hour: "2"
+    job: "sh /home/{{ ansible_user }}/infrastructure/services/dyndns-check/check-dyndns.sh"
+
+- name: Run "Check-DynDNS" Script
+  become: true
+  ansible.builtin.shell: "sh /home/{{ ansible_user }}/infrastructure/services/dyndns-check/check-dyndns.sh"
+
+- name: Update traefik acme.json permissions
+  become: true
+  ansible.builtin.file:
+    path: "/home/{{ ansible_user }}/infrastructure/services/traefik/data/acme.json"
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: '0744'
+
+- name: Start traefik
+  become: true
+  community.docker.docker_compose_v2:
+    project_src: /home/{{ ansible_user }}/infrastructure/services/traefik

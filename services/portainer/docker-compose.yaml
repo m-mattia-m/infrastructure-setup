@@ -25,19 +25,19 @@ services:
       - "traefik.enable=true"
       - "traefik.docker.network=proxy"
       - "traefik.http.routers.portainer-http.entrypoints=web" # 'web' could be 'http' if also in config file used
-      - "traefik.http.routers.portainer-http.rule=Host(`portainer.{portainer.fqdn}`)"
+      - "traefik.http.routers.portainer-http.rule=Host(`portainer.${ANSIBLE_HOST_FQDN}`)"
       # - "traefik.http.middlewares.traefik-auth.basicauth.users=${TRAEFIK_DASHBOARD_CREDENTIALS}"
       - "traefik.http.middlewares.portainer-https-redirect.redirectscheme.scheme=https"
       - "traefik.http.middlewares.sslheader.headers.customrequestheaders.X-Forwarded-Proto=https"
       - "traefik.http.routers.portainer-https.middlewares=portainer-https-redirect"
       - "traefik.http.routers.portainer-https.entrypoints=websecure" # 'websecure' could be 'https' if also in config file used
-      - "traefik.http.routers.portainer-https.rule=Host(`portainer.{portainer.fqdn}`)"
+      - "traefik.http.routers.portainer-https.rule=Host(`portainer.${ANSIBLE_HOST_FQDN}`)"
       # - "traefik.http.routers.portainer-https.middlewares=traefik-auth"
       - "traefik.http.routers.portainer-https.tls=true"
       - "traefik.http.routers.portainer-https.tls.certresolver=infomaniak"
       - "traefik.http.services.portainer.loadbalancer.server.port=9000"
-      - "traefik.http.middlewares.portainer-https.ipallowlist.sourcerange=${remote.host.ip.or.dyndns}"
-      - "traefik.http.middlewares.portainer-http.ipallowlist.sourcerange=${remote.host.ip.or.dyndns}"
+      - "traefik.http.middlewares.portainer-https.ipallowlist.sourcerange=${SOURCE_RANGE}"
+      - "traefik.http.middlewares.portainer-http.ipallowlist.sourcerange=${SOURCE_RANGE}"
       - "traefik.http.routers.portainer-https.middlewares=portainer-https@docker" # important to add the middleware to your router
       - "traefik.http.routers.portainer-http.middlewares=portainer-http@docker" # important to add the middleware to your router
 

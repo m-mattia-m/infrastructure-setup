@@ -1,0 +1,41 @@
+---
+
+- name: Run the pre setup tasks
+  ansible.builtin.include_role:
+    name: pre_setup_tasks
+
+- name: Copy the whole service directory to the remote
+  become: true
+  ansible.builtin.copy:
+    src: ../../../../services/shlink/
+    dest: "/home/{{ ansible_user }}/infrastructure/services/shlink/"
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: '0744'
+    directory_mode: '0744'
+
+- name: Create .env file for Shlink
+  become: true
+  ansible.builtin.copy:
+    dest: "/home/{{ ansible_user }}/infrastructure/services/shlink/.env"
+    content: |
+      SHLINK_DB_PASSWORD={{ shlink_db_password }}
+      SHLINK_GEOLITE_LICENSE_KEY={{ shlink_geolite_license_key }}
+      SHLINK_INITIAL_API_KEY={{ shlink_initial_api_key }}
+      SHLINK_SERVER_FQDN={{ shlink_server_fqdn }}
+      SHLINK_SERVER_URL={{ shlink_server_url }}
+      SHLINK_UI_FQDN={{ shlink_ui_fqdn }}
+      SOURCE_RANGE={{ source_range }}
+    mode: '0744'
+
+- name: Setup database for shlink
+  ansible.builtin.include_tasks: roles/shared/tasks/create-service-database-mysql/tasks/main.yaml
+  vars:
+    root_password: "{{ db_cluster_root_password }}"
+    service_db_name: "shlink"
+    service_db_password: "shlink"
+
+- name: Start shlink
+  become: true
+  community.docker.docker_compose_v2:
+    project_src: /home/{{ ansible_user }}/infrastructure/services/shlink

@@ -1,0 +1,64 @@
+---
+
+- name: Drop existing database '{{ service_db_name }}'
+  ansible.builtin.postgresql_db:
+    login_host: 127.0.0.1 # localhost -> unix-socket; 127.0.0.1 -> TCP
+    login_port: 5432
+    login_user: postgres
+    login_password: "{{ root_password }}"
+    name: "{{ service_db_name }}"
+    state: absent
+  failed_when: false
+
+- name: Drop existing user '{{ service_db_name }}'
+  ansible.builtin.postgresql_user:
+    login_host: 127.0.0.1 # localhost -> unix-socket; 127.0.0.1 -> TCP
+    login_port: 5432
+    login_user: postgres
+    login_password: "{{ root_password }}"
+    name: "{{ service_db_name }}"
+    state: absent
+  failed_when: false
+
+- name: Create database '{{ service_db_name }}'
+  ansible.builtin.postgresql_db:
+    login_host: 127.0.0.1 # localhost -> unix-socket; 127.0.0.1 -> TCP
+    login_port: 5432
+    login_user: postgres
+    login_password: "{{ root_password }}"
+    name: "{{ service_db_name }}"
+    state: present
+  register: create_db_result
+  retries: 3
+  delay: 10
+  until: create_db_result is not failed
+
+- name: Create Postgres user '{{ service_db_name }}'
+  ansible.builtin.postgresql_user:
+    login_host: 127.0.0.1 # localhost -> unix-socket; 127.0.0.1 -> TCP
+    login_port: 5432
+    login_user: postgres
+    login_password: "{{ root_password }}"
+    name: "{{ service_db_name }}"
+    password: "{{ service_db_password }}"
+    state: present
+  register: create_user_result
+  retries: 3
+  delay: 10
+  until: create_user_result is not failed
+
+- name: Authorize Postgres user '{{ service_db_name }}'
+  ansible.builtin.postgresql_privs:
+    login_host: 127.0.0.1 # localhost -> unix-socket; 127.0.0.1 -> TCP
+    login_port: 5432
+    login_user: postgres
+    login_password: "{{ root_password }}"
+    database: "{{ service_db_name }}"
+    state: present
+    privs: ALL
+    objs: ALL_IN_SCHEMA
+    roles: postgres
+  register: create_user_privs_result
+  retries: 3
+  delay: 10
+  until: create_user_privs_result is not failed

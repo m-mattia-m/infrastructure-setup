@@ -18,20 +18,20 @@ services:
       - DB_NAME=shlink
       - DB_USER=shlink
       - DB_PASSWORD=${SHLINK_DB_PASSWORD}
-      - DB_HOST=database
+      - DB_HOST=mysql-database"
       - INITIAL_API_KEY=${SHLINK_INITIAL_API_KEY}
       - GEOLITE_LICENSE_KEY=${SHLINK_GEOLITE_LICENSE_KEY}
     labels:
       - "traefik.enable=true"
       - "traefik.docker.network=proxy" # is to define which network should be used for traeffik (only needed if multiple networks are linked)
       - "traefik.http.routers.shlink-backend-http.entrypoints=web" # 'web' could be 'http' if also in config file used
-      - "traefik.http.routers.shlink-backend-http.rule=Host(`{shlink.fqdn}`)"
+      - "traefik.http.routers.shlink-backend-http.rule=Host(`${SHLINK_SERVER_FQDN}`)"
       # - "traefik.http.middlewares.traefik-auth.basicauth.users=${TRAEFIK_DASHBOARD_CREDENTIALS}"
       - "traefik.http.middlewares.shlink-backend-https-redirect.redirectscheme.scheme=https"
       - "traefik.http.middlewares.sslheader.headers.customrequestheaders.X-Forwarded-Proto=https"
       - "traefik.http.routers.shlink-backend-https.middlewares=shlink-backend-https-redirect"
       - "traefik.http.routers.shlink-backend-https.entrypoints=websecure" # 'websecure' could be 'https' if also in config file used
-      - "traefik.http.routers.shlink-backend-https.rule=Host(`{shlink.fqdn}`)"
+      - "traefik.http.routers.shlink-backend-https.rule=Host(`${SHLINK_SERVER_FQDN}`)"
       # - "traefik.http.routers.shlink-backend-https.middlewares=traefik-auth"
       - "traefik.http.routers.shlink-backend-https.tls=true"
       - "traefik.http.routers.shlink-backend-https.tls.certresolver=infomaniak"
@@ -55,16 +55,16 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.shlink-ui-http.entrypoints=web" # 'web' could be 'http' if also in config file used
-      - "traefik.http.routers.shlink-ui-http.rule=Host(`{shlink.fqdn.ui}`)"
+      - "traefik.http.routers.shlink-ui-http.rule=Host(`${SHLINK_UI_FQDN}`)"
       - "traefik.http.middlewares.shlink-ui-https-redirect.redirectscheme.scheme=https"
       - "traefik.http.middlewares.sslheader.headers.customrequestheaders.X-Forwarded-Proto=https"
       - "traefik.http.routers.shlink-ui-https.middlewares=shlink-ui-https-redirect"
       - "traefik.http.routers.shlink-ui-https.entrypoints=websecure" # 'websecure' could be 'https' if also in config file used
-      - "traefik.http.routers.shlink-ui-https.rule=Host(`{shlink.fqdn.ui}`)"
+      - "traefik.http.routers.shlink-ui-https.rule=Host(`${SHLINK_UI_FQDN}`)"
       - "traefik.http.routers.shlink-ui-https.tls=true"
       - "traefik.http.routers.shlink-ui-https.tls.certresolver=infomaniak"
-      - "traefik.http.middlewares.shlink-ui-https.ipallowlist.sourcerange=${remote.host.ip.or.dyndns}"
-      - "traefik.http.middlewares.shlink-ui-http.ipallowlist.sourcerange=${remote.host.ip.or.dyndns}"
+      - "traefik.http.middlewares.shlink-ui-https.ipallowlist.sourcerange=${SOURCE_RANGE}"
+      - "traefik.http.middlewares.shlink-ui-http.ipallowlist.sourcerange=${SOURCE_RANGE}"
       - "traefik.http.routers.shlink-ui-https.middlewares=shlink-ui-https@docker" # important to add the middleware to your router
       - "traefik.http.routers.shlink-ui-http.middlewares=shlink-ui-http@docker" # important to add the middleware to your router
       # no allow-list on account of accessing from IP-adresses which are not from home

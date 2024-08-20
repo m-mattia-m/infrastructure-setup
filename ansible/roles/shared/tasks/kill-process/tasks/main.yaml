@@ -1,6 +1,7 @@
-- name: Check if port 80 is in use
+---
+- name: Check if port {{ port_to_kill }} is in use
   become: true
-  ansible.builtin.command: "lsof -t -i :80"
+  ansible.builtin.command: "lsof -t -i :{{ port_to_kill }}"
   register: port_check
   ignore_errors: true
   changed_when: false
@@ -9,14 +10,14 @@
   ansible.builtin.debug:
     var: port_check.stdout_lines
 
-- name: Kill process if port 80 is in use
+- name: Kill process if port {{ port_to_kill }} is in use
   become: true
   ansible.builtin.command: "kill {{ item }}"
   with_items: "{{ port_check.stdout_lines }}"
   failed_when: false
   when: port_check.stdout_lines is defined and port_check.stdout_lines | length > 0
 
-- name: Debug no process found on port 80
+- name: Debug no process found on port {{ port_to_kill }}
   ansible.builtin.debug:
-    msg: "No processes found listening on port 80"
+    msg: "No processes found listening on port {{ port_to_kill }}"
   when: not (port_check.stdout_lines is defined and port_check.stdout_lines | length > 0)

@@ -1,0 +1,47 @@
+services:
+  rclone:
+    image: rclone/rclone:latest
+    hostname: rclone
+    container_name: rclone
+    security_opt:
+      - no-new-privileges:true
+    restart: unless-stopped
+    command: rcd --rc-web-gui --rc-addr 0.0.0.0:5572 --rc-web-fetch-url=https://api.github.com/repos/rclone/rclone-webui-react/releases/latest --rc-web-gui-update --rc-user ${RCLONE_USERNAME} --rc-pass ${RCLONE_PASSWORD} -vv --checksum --transfers=4 --checkers=4 --contimeout=60s --timeout=300s --retries=3 --low-level-retries=10 --stats=1s --stats-file-name-length=0
+    ports:
+     - "5572:5572"
+    volumes:
+      - /home/${ANSIBLE_USER}/infrastructure/services/rclone/config:/config/rclone
+      - /home/${ANSIBLE_USER}/infrastructure/services/rclone/rclone-dashboard/sync_script:/sync_script
+      - /home/${ANSIBLE_USER}/infrastructure/services/paperless/consume:/data
+      - /home/${ANSIBLE_USER}/infrastructure/services/paperless/export:/data
+      - /home/${ANSIBLE_USER}/infrastructure/services/paperless/media:/data
+    environment:
+      PHP_TZ: Europe/Zurich
+    networks:
+      - data-net
+      - proxy
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=proxy" # is to define which network should be used for traeffik (only needed if multiple networks are linked)
+      - "traefik.http.routers.rclone-http.entrypoints=web" # 'web' could be 'http' if also in config file used
+      - "traefik.http.routers.rclone-http.rule=Host(`rclone.${ANSIBLE_HOST_FQDN}`)"
+      # - "traefik.http.middlewares.traefik-auth.basicauth.users=${TRAEFIK_DASHBOARD_CREDENTIALS}"
+      - "traefik.http.middlewares.rclone-https-redirect.redirectscheme.scheme=https"
+      - "traefik.http.middlewares.sslheader.headers.customrequestheaders.X-Forwarded-Proto=https"
+      - "traefik.http.routers.rclone-https.middlewares=rclone-https-redirect"
+      - "traefik.http.routers.rclone-https.entrypoints=websecure" # 'websecure' could be 'https' if also in config file used
+      - "traefik.http.routers.rclone-https.rule=Host(`rclone.${ANSIBLE_HOST_FQDN}`)"
+      # - "traefik.http.routers.rclone-https.middlewares=traefik-auth"
+      - "traefik.http.routers.rclone-https.tls=true"
+      - "traefik.http.routers.rclone-https.tls.certresolver=infomaniak"
+      - "traefik.http.middlewares.rclone-http.ipallowlist.sourcerange=${SOURCE_RANGE}"
+      - "traefik.http.middlewares.rclone-https.ipallowlist.sourcerange=${SOURCE_RANGE}"
+      - "traefik.http.routers.rclone-https.middlewares=rclone-https@docker" # important to add the middleware to your router
+      - "traefik.http.routers.rclone-http.middlewares=rclone-http@docker" # important to add the middleware to your router
+
+networks:
+  data-net:
+    external: true
+  proxy:
+    external: true
+    internal: false
